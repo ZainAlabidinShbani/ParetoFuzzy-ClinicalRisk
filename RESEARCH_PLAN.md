@@ -5,7 +5,7 @@ via Multi-Objective Evolutionary Optimization (NSGA-II)
 
 **Target venue:** Applied Soft Computing (Elsevier), `elsarticle`, subscription track.
 
-**Status:** Phase 1 complete; Phase 2 (implementation + dev pilot) in progress. Held-out datasets
+**Status:** Phase 1 complete; Phase 2 implementation and tests complete, dev pilot pending (see PROGRESS.md). Held-out datasets
 are locked until Phase 3 preregistration (`PREREGISTRATION.md`, `status: locked`).
 
 ---
@@ -219,7 +219,7 @@ Known risks to address at preregistration:
 ## 8. Phases
 
 1. **Audit, environment, literature, plan.** Done.
-2. **Implementation, unit tests, 1-seed dev pilot.** In progress.
+2. **Implementation, unit tests, 1-seed dev pilot.** Code + 58 tests done; pilot pending.
 3. Preregistration: freeze code (git tag), hyperparameters, selection rule,
    metrics, tests, and held-out unlock.
 4. Full runs: 5×5 CV on all 6 datasets; ablations (objective sets, consequent
