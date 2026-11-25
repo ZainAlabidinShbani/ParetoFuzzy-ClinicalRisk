@@ -28,38 +28,57 @@ OBJ_SCALE = {"auroc": 0.5, "brier": 0.25, "ece": 0.5, "logloss": float(np.log(2)
 
 
 # --------------------------------------------------------------------------- #
+LAMBDAS = (0.01, 0.1, 1.0, 10.0)
+
+
 class FitnessEvaluator:
+    """Objectives of a genome from inner-CV out-of-fold predictions (training rows only).
+
+    With hybrid consequents, the L2 penalty of the logistic consequent fit is selected
+    per genome from ``lambdas`` by minimum pooled inner-OOF log-loss (a proper scoring
+    rule); the objectives are then computed from that lambda's OOF predictions.
+    """
+
     def __init__(self, spec: GenomeSpec, X, y, objectives=("auroc", "brier", "complexity"),
-                 inner_folds: int = 3, lam: float = 1.0, seed: int = 0):
+                 inner_folds: int = 3, lambdas=LAMBDAS, seed: int = 0):
         self.spec = spec
         self.X = np.asarray(X, float)
         self.y = np.asarray(y, int)
         self.objectives = tuple(objectives)
-        self.lam = lam
+        self.lambdas = tuple(sorted(np.atleast_1d(lambdas).astype(float), reverse=True))
         self.n_evals = 0
         if not spec.evolve_consequents:
             skf = StratifiedKFold(n_splits=inner_folds, shuffle=True, random_state=seed)
             self.folds = list(skf.split(self.X, self.y))
 
-    def predict_oof(self, x) -> tuple[np.ndarray, object]:
+    def predict_oof(self, x):
+        """Returns (oof probabilities, rule base, selected lambda or nan)."""
         rb, _ = self.spec.decode(x)
         if self.spec.evolve_consequents:
-            return rb.predict_proba(self.X)[:, 1], rb
-        p = np.empty(len(self.y))
+            return rb.predict_proba(self.X)[:, 1], rb, float("nan")
+        y = self.y
         if rb.n_rules == 0:
+            p = np.empty(len(y))
             for tr, va in self.folds:
-                p[va] = self.y[tr].mean()
-            return p, rb
+                p[va] = y[tr].mean()
+            return p, rb, float("nan")
         B = rb.firing(self.X)
-        for tr, va in self.folds:
-            b0, w = fit_logistic_l2(B[tr], self.y[tr], lam=self.lam)
-            z = np.clip(b0 + B[va] @ w, -35, 35)
-            p[va] = 1.0 / (1.0 + np.exp(-z))
-        return p, rb
+        best, warm = None, [None] * len(self.folds)
+        for lam in self.lambdas:  # descending: warm-start along the regularisation path
+            p = np.empty(len(y))
+            for k, (tr, va) in enumerate(self.folds):
+                b0, w = fit_logistic_l2(B[tr], y[tr], lam=lam, w0=warm[k])
+                warm[k] = np.concatenate([[b0], w])
+                z = np.clip(b0 + B[va] @ w, -35, 35)
+                p[va] = 1.0 / (1.0 + np.exp(-z))
+            ll = log_loss(y, p)
+            if best is None or ll < best[0] - 1e-12:
+                best = (ll, p, lam)
+        return best[1], rb, best[2]
 
     def metrics(self, x) -> dict:
         self.n_evals += 1
-        p, rb = self.predict_oof(x)
+        p, rb, lam = self.predict_oof(x)
         y = self.y
         a = auroc(y, p)
         return {
@@ -68,9 +87,10 @@ class FitnessEvaluator:
             "ece": ece(y, p),
             "logloss": log_loss(y, p),
             "accuracy": float(np.mean((p >= 0.5) == y)),
-            "complexity": rb.complexity(),
+            "complexity": rb.complexity(),          # total literals (integer)
             "n_rules": rb.n_rules,
             "mean_antecedents": rb.mean_antecedents,
+            "lam": lam,
         }
 
     def objective_vector(self, m: dict) -> np.ndarray:
@@ -213,39 +233,48 @@ class FuzzyMutation(Mutation):
 
 
 # --------------------------------------------------------------------------- #
-class HVCallback(Callback):
-    """Records normalised hypervolume of the current non-dominated set per generation."""
+class ArchiveCallback(Callback):
+    """External archive of all non-dominated solutions seen during the run
+    (deduplicated on objective vectors), plus normalised HV of the archive per generation."""
 
     def __init__(self, scales, ref=1.0):
         super().__init__()
         self.scales = np.asarray(scales, float)
         self.ref = ref
+        self.X = None
+        self.F = None
         self.hv = []
 
     def notify(self, algorithm):
-        F = algorithm.pop.get("F") / self.scales
-        nd = F[non_dominated_mask(F)]
-        self.hv.append(hypervolume(nd, np.full(F.shape[1], self.ref)))
+        X, F = algorithm.pop.get("X"), algorithm.pop.get("F")
+        if self.X is not None:
+            X, F = np.vstack([self.X, X]), np.vstack([self.F, F])
+        nd = non_dominated_mask(F)
+        X, F = X[nd], F[nd]
+        _, keep = np.unique(np.round(F, 12), axis=0, return_index=True)  # one genome per objective vector
+        keep = np.sort(keep)
+        self.X, self.F = X[keep], F[keep]
+        Fn = self.F / self.scales
+        self.hv.append(hypervolume(Fn, np.full(Fn.shape[1], self.ref)))
 
 
 def objective_scales(objectives, spec: GenomeSpec):
-    return [OBJ_SCALE.get(o, spec.R_max + spec.L_max) for o in objectives]
+    """Normalisation for hypervolume; complexity (total literals) scaled by R_max * L_max."""
+    return [OBJ_SCALE.get(o, spec.R_max * spec.L_max) for o in objectives]
 
 
-def run_nsga2(evaluator: FitnessEvaluator, mf_init, pop_size=60, n_gen=60, seed=0):
+def run_nsga2(evaluator: FitnessEvaluator, mf_init, pop_size=80, n_gen=80, seed=0):
     spec = evaluator.spec
     problem = FuzzyProblem(evaluator)
     algo = NSGA2(pop_size=pop_size, sampling=FuzzySampling(spec, mf_init),
                  crossover=FuzzyCrossover(spec), mutation=FuzzyMutation(spec),
                  eliminate_duplicates=True)
-    cb = HVCallback(objective_scales(evaluator.objectives, spec))
-    res = minimize(problem, algo, ("n_gen", n_gen), seed=seed, verbose=False, callback=cb)
-    X, F = res.pop.get("X"), res.pop.get("F")
-    nd = non_dominated_mask(F)
-    return {"X": X[nd], "F": F[nd], "hv_history": cb.hv, "n_evals": evaluator.n_evals}
+    cb = ArchiveCallback(objective_scales(evaluator.objectives, spec))
+    minimize(problem, algo, ("n_gen", n_gen), seed=seed, verbose=False, callback=cb)
+    return {"X": cb.X, "F": cb.F, "hv_history": cb.hv, "n_evals": evaluator.n_evals}
 
 
-def run_ga(evaluator: FitnessEvaluator, mf_init, pop_size=60, n_gen=60, seed=0):
+def run_ga(evaluator: FitnessEvaluator, mf_init, pop_size=80, n_gen=80, seed=0):
     spec = evaluator.spec
     assert len(evaluator.objectives) == 1
     problem = FuzzyProblem(evaluator)
@@ -259,12 +288,18 @@ def run_ga(evaluator: FitnessEvaluator, mf_init, pop_size=60, n_gen=60, seed=0):
 
 
 def select_eps_compact(front_metrics: list[dict], eps: float = 0.01) -> int:
-    """Preregistered selection rule for a single deployable model.
+    """Preregistered headline operating point.
 
-    Among front members whose inner-CV AUROC is within ``eps`` of the best,
-    choose the least complex; ties broken by lower inner-CV Brier score.
+    Among archive members whose inner-OOF AUROC is within ``eps`` of the best, choose
+    the one with the fewest total literals; ties broken by lower inner-OOF Brier.
     """
     aucs = np.array([m["auroc"] for m in front_metrics])
     ok = np.flatnonzero(aucs >= aucs.max() - eps)
     key = sorted(ok, key=lambda i: (front_metrics[i]["complexity"], front_metrics[i]["brier"], i))
     return int(key[0])
+
+
+def select_best_brier(front_metrics: list[dict]) -> int:
+    """Secondary (ablation) operating point: lowest inner-OOF Brier; ties -> fewer literals."""
+    return int(min(range(len(front_metrics)),
+                   key=lambda i: (front_metrics[i]["brier"], front_metrics[i]["complexity"], i)))

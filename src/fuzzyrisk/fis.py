@@ -85,9 +85,14 @@ class FuzzyRuleBase:
     def total_conditions(self) -> int:
         return int(sum(len(r) for r in self.rules))
 
-    def complexity(self) -> float:
-        """Interpretability objective f3 = active rules + mean antecedents per rule."""
-        return self.n_rules + self.mean_antecedents
+    @property
+    def total_literals(self) -> int:
+        return self.total_conditions
+
+    def complexity(self) -> int:
+        """Interpretability objective f3 = total literals (antecedent conditions summed over
+        distinct active rules). Integer-valued, which limits front saturation."""
+        return self.total_conditions
 
     # ------------------------------------------------------------------ #
     def memberships(self, X) -> dict:

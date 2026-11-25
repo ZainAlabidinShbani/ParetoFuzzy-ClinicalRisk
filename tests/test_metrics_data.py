@@ -78,3 +78,48 @@ def test_dev_datasets_checksums(name, n, n_pos):
     ds = D.load_dataset(name)  # raises ChecksumError on any md5 / sha256 mismatch
     assert len(ds.y) == n and int(ds.y.sum()) == n_pos
     assert ds.sha256 == D._load_pins()[name]
+
+
+def _fake_ckd(n=400, n_pos=250, seed=0):
+    import pandas as pd
+    rng = np.random.default_rng(seed)
+    sch = D.REGISTRY["kidney_ckd"]["schema"]
+    df = {}
+    for c in sch["numeric"]:
+        v = rng.normal(50, 10, n).round(1).astype(object)
+        v[rng.choice(n, 5, replace=False)] = "?"           # missing token
+        v[rng.choice(n, 2, replace=False)] = "\t43"        # stray tab (UCI artefact)
+        df[{"wbcc": "wc", "rbcc": "rc"}.get(c, c)] = v     # exercise aliases
+    for c, lv in sch["binary"].items():
+        v = rng.choice(lv, n).astype(object)
+        v[0] = "\t" + lv[1]
+        v[1] = "?"
+        df[c] = v
+    y = np.array(["ckd"] * n_pos + ["notckd"] * (n - n_pos), dtype=object)
+    y[0] = "ckd\t"
+    df["class"] = y
+    return pd.DataFrame(df)
+
+
+def test_ckd_schema_loader_cleans_and_types(monkeypatch, tmp_path):
+    monkeypatch.setattr(D, "_fetch_raw", lambda name, spec: _fake_ckd())
+    monkeypatch.setattr(D, "preregistration_locked", lambda: True)
+    monkeypatch.setattr(D, "PINS_FILE", tmp_path / "pins.json")
+    monkeypatch.setattr(D, "DATA_RAW", tmp_path)
+    ds = D.load_dataset("kidney_ckd", allow_heldout=True, pin_if_missing=True)
+    sch = D.REGISTRY["kidney_ckd"]["schema"]
+    assert ds.numeric_cols == sch["numeric"] and ds.binary_cols == list(sch["binary"])
+    assert int(ds.y.sum()) == 250 and len(ds.y) == 400
+    assert ds.X["age"].dtype == float and ds.X["age"].isna().sum() == 5
+    assert (ds.X["wbcc"] == 43.0).sum() >= 2                  # tab-stripped numeric parsed
+    assert ds.X["htn"].iloc[0] == "yes" and ds.X["htn"].isna().iloc[1]
+    assert set(ds.X["htn"].dropna()) <= {"no", "yes"}
+
+
+def test_positive_class_count_check(monkeypatch, tmp_path):
+    monkeypatch.setattr(D, "_fetch_raw", lambda name, spec: _fake_ckd(n_pos=150))  # flipped labels
+    monkeypatch.setattr(D, "preregistration_locked", lambda: True)
+    monkeypatch.setattr(D, "PINS_FILE", tmp_path / "pins.json")
+    monkeypatch.setattr(D, "DATA_RAW", tmp_path)
+    with pytest.raises(D.ChecksumError):
+        D.load_dataset("kidney_ckd", allow_heldout=True, pin_if_missing=True)

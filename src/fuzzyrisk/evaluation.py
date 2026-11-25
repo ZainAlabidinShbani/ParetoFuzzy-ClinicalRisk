@@ -51,7 +51,7 @@ class PeakRSS:
 def model_factory(name: str, ds: Dataset, seed: int, cfg: dict):
     cols = dict(numeric_cols=ds.numeric_cols, binary_cols=ds.binary_cols,
                 nominal_cols=ds.nominal_cols, categories=ds.categories)
-    ga = dict(pop_size=cfg.get("pop_size", 60), n_gen=cfg.get("n_gen", 60),
+    ga = dict(pop_size=cfg.get("pop_size", 80), n_gen=cfg.get("n_gen", 80),
               R_max=cfg.get("R_max", 12), L_max=cfg.get("L_max", 4), random_state=seed)
     n_iter = cfg.get("n_iter", 15)
     table = {
@@ -76,7 +76,8 @@ def model_factory(name: str, ds: Dataset, seed: int, cfg: dict):
 def _complexity(model) -> dict:
     if isinstance(model, FuzzyRiskClassifier):
         return {"n_rules": model.n_rules_, "mean_antecedents": model.mean_antecedents_,
-                "complexity": model.complexity_, "inner_hv": model.inner_hv_, "n_evals": model.n_evals_}
+                "complexity": model.complexity_, "inner_hv": model.inner_hv_, "n_evals": model.n_evals_,
+                "lambda": model.lambda_, "archive_size": len(model.front_X_)}
     if isinstance(model, TunedModel) and model.name == "dtree" and model.calibration is None:
         t = model.model_.named_steps["clf"].tree_
         depth = np.zeros(t.node_count, int)
@@ -86,7 +87,8 @@ def _complexity(model) -> dict:
                     depth[c] = depth[i] + 1
         leaves = t.children_left == -1
         n, L = int(leaves.sum()), float(depth[leaves].mean())
-        return {"n_rules": n, "mean_antecedents": L, "complexity": n + L}
+        # each leaf = one conjunctive rule; total literals = sum of leaf depths
+        return {"n_rules": n, "mean_antecedents": L, "complexity": int(depth[leaves].sum())}
     return {"n_rules": np.nan, "mean_antecedents": np.nan, "complexity": np.nan}
 
 
@@ -123,7 +125,19 @@ def fit_one(ds: Dataset, name: str, fold: int, tr, te, seed: int, cfg: dict, spy
            "fit_s": fit_s, "predict_s": pred_s, "peak_rss_mb": mon.peak_mb,
            "rss_delta_mb": mon.peak_mb - mon.start_mb}
     front = rules = None
+    extra = []
     if isinstance(model, FuzzyRiskClassifier) and model.algorithm == "nsga2":
+        # secondary (ablation) operating point from the same run: best inner-OOF Brier
+        j = model.best_brier_index_
+        rbj = model.member_rulebase(j)
+        pj = rbj.predict_proba(model.prep_.transform(X_te))[:, 1]
+        rj = {**rec, "model": name.replace("NSGA-II", "best-Brier"), **all_metrics(y_te, pj),
+              "n_rules": rbj.n_rules, "mean_antecedents": rbj.mean_antecedents,
+              "complexity": rbj.complexity(), "lambda": model.front_metrics_[j]["lam"],
+              "ablation_of": name}
+        extra.append({"record": {k: (v.item() if isinstance(v, np.generic) else v) for k, v in rj.items()},
+                      "pred": {"row": [int(r) for r in te], "y": [int(v) for v in y_te],
+                               "p": [float(v) for v in pj]}})
         fr = _test_front(model, X_te, y_te)
         rec["test_hv"] = fr["test_hv"]
         front = {"dataset": ds.name, "seed": seed, "fold": fold, "model": name, **fr,
@@ -133,7 +147,7 @@ def fit_one(ds: Dataset, name: str, fold: int, tr, te, seed: int, cfg: dict, spy
     rec = {k: (v.item() if isinstance(v, np.generic) else v) for k, v in rec.items()}
     pred = {"row": [int(r) for r in te], "y": [int(v) for v in y_te], "p": [float(v) for v in p]}
     del model
-    return {"record": rec, "pred": pred, "front": front, "rules": rules}
+    return {"record": rec, "pred": pred, "front": front, "rules": rules, "extra": extra}
 
 
 def run_cv(ds: Dataset, models: list[str], seed: int = 0, n_folds: int = 5, cfg: dict | None = None,
@@ -161,6 +175,10 @@ def run_cv(ds: Dataset, models: list[str], seed: int = 0, n_folds: int = 5, cfg:
             records.append(rec)
             preds.append(pd.DataFrame({"dataset": ds.name, "seed": seed, "fold": fold, "model": name,
                                        **pl["pred"]}))
+            for ex in pl.get("extra", []):
+                records.append(ex["record"])
+                preds.append(pd.DataFrame({"dataset": ds.name, "seed": seed, "fold": fold,
+                                           "model": ex["record"]["model"], **ex["pred"]}))
             if pl["front"] is not None:
                 fronts.append(pl["front"])
             if pl["rules"] is not None:

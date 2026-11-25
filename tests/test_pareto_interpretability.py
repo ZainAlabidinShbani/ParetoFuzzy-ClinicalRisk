@@ -81,7 +81,7 @@ def test_decode_counts_distinct_active_rules():
     assert [len(r) for r in rb.rules] == [1, 2, 3]
     assert rb.mean_antecedents == pytest.approx(2.0)
     assert rb.total_conditions == 6
-    assert rb.complexity() == pytest.approx(3 + 2.0)
+    assert rb.complexity() == 6 == rb.total_literals  # f3 = total literals
     rb.weights = np.array([1.0, -0.5, 0.25]); rb.bias = -1.0
     text = "\n".join(rb.describe())
     assert "IF age is High THEN +1.000" in text
@@ -131,3 +131,42 @@ def test_empty_rule_base_is_intercept_only():
     P = rb.predict_proba(np.random.default_rng(0).random((7, 4)))
     assert P.shape == (7, 2)
     np.testing.assert_allclose(P[:, 1], 1 / (1 + np.exp(-0.3)))
+
+
+def test_archive_is_nondominated_unique_and_lambda_selected(synth, cols):
+    from fuzzyrisk.optim import LAMBDAS
+    m = FuzzyRiskClassifier("nsga2", pop_size=16, n_gen=6, R_max=6, random_state=2, **cols)
+    m.fit(synth.X.iloc[:180], synth.y[:180])
+    F = m.front_F_
+    assert non_dominated_mask(F).all()
+    assert len(np.unique(np.round(F, 12), axis=0)) == len(F)
+    assert np.all(F[:, 2] == np.round(F[:, 2]))  # integer total literals
+    assert len(m.hv_history_) == 6 and np.all(np.diff(m.hv_history_) >= -1e-12)  # archive HV monotone
+    lams = {met["lam"] for met in m.front_metrics_ if met["n_rules"] > 0}
+    assert lams <= set(LAMBDAS)
+    assert 0 <= m.best_brier_index_ < len(F)
+    assert m.front_metrics_[m.best_brier_index_]["brier"] == min(x["brier"] for x in m.front_metrics_)
+
+
+def test_lambda_selection_minimises_inner_oof_logloss(synth, cols):
+    from fuzzyrisk.encoding import GenomeSpec
+    from fuzzyrisk.metrics import log_loss
+    from fuzzyrisk.optim import FitnessEvaluator, FuzzySampling
+    from fuzzyrisk.preprocessing import TabularPreprocessor
+    pp = TabularPreprocessor("fuzzy", **cols).fit(synth.X)
+    Z = pp.transform(synth.X)
+    spec = GenomeSpec(pp.feature_kinds_, R_max=6, L_max=3)
+
+    class P:
+        n_var = spec.n_var
+
+    X = FuzzySampling(spec, np.tile([0.2, 0.5, 0.8], (len(spec.cont), 1)))._do(
+        P, 5, random_state=np.random.default_rng(0))
+    full = FitnessEvaluator(spec, Z, synth.y)
+    for x in X:
+        p, rb, lam = full.predict_oof(x)
+        if rb.n_rules == 0:
+            continue
+        for other in (0.01, 0.1, 1.0, 10.0):
+            po, _, _ = FitnessEvaluator(spec, Z, synth.y, lambdas=(other,)).predict_oof(x)
+            assert log_loss(synth.y, p) <= log_loss(synth.y, po) + 1e-9

@@ -50,6 +50,7 @@ REGISTRY: dict[str, dict] = {
         "target": "class", "positive": ["tested_positive"],
         # physiologically impossible zeros are missing values (row-wise rule, no fitting)
         "zero_as_missing": ["plas", "pres", "skin", "insu", "mass"],
+        "expected_n": 768, "expected_pos": 268,
         "description": "Pima Indians Diabetes (onset of diabetes within 5 years), n=768.",
         "citation_keys": ["vanschoren2014"],
     },
@@ -58,6 +59,7 @@ REGISTRY: dict[str, dict] = {
         "source": "openml", "openml_id": 49, "openml_md5": "f255fbfe272738f3da960f63a451ca0a",
         "target": "num", "positive": [">50_1", ">50_2", ">50_3", ">50_4"],
         "zero_as_missing": [],
+        "expected_n": 303, "expected_pos": 138,
         "description": "Cleveland heart disease (angiographic >50% narrowing), n=303.",
         "citation_keys": ["detrano1989", "vanschoren2014"],
     },
@@ -65,15 +67,19 @@ REGISTRY: dict[str, dict] = {
     "breast_wdbc": {
         "role": "heldout",
         "source": "openml", "openml_id": 1510, "openml_md5": "7aa183d3657e364911ced0cbd6b272bd",
-        "target": "Class", "positive": ["2"],  # to be confirmed against OpenML docs at unlock
+        # OpenML 1510 description: "prognosis (benign (1) or malignant (2))"
+        "target": "Class", "positive": ["2"],
         "zero_as_missing": [],
+        "expected_n": 569, "expected_pos": 212,
         "description": "Breast Cancer Wisconsin (Diagnostic), malignant vs benign, n=569.",
     },
     "liver_ilpd": {
         "role": "heldout",
         "source": "openml", "openml_id": 1480, "openml_md5": "155295549a459387fb71312caf1b8360",
-        "target": "Class", "positive": ["1"],  # 1 = liver patient (to be confirmed at unlock)
+        # OpenML 1480 / UCI ILPD: 416 liver patients, 167 non-patients; selector 1 = patient
+        "target": "Class", "positive": ["1"],
         "zero_as_missing": [],
+        "expected_n": 583, "expected_pos": 416,
         "description": "Indian Liver Patient Dataset, liver disease vs not, n=583.",
     },
     "thyroid_sick": {
@@ -81,6 +87,7 @@ REGISTRY: dict[str, dict] = {
         "source": "openml", "openml_id": 38, "openml_md5": "ee5cb4b7f41a5f44b0cd234f675ab492",
         "target": "Class", "positive": ["sick"],
         "zero_as_missing": [],
+        "expected_n": 3772, "expected_pos": 231,
         "description": "Thyroid 'sick' (Garvan), sick vs negative, n=3772.",
     },
     "kidney_ckd": {
@@ -88,6 +95,17 @@ REGISTRY: dict[str, dict] = {
         "source": "uci", "uci_id": 336, "url": "https://archive.ics.uci.edu/static/public/336/data.csv",
         "target": "class", "positive": ["ckd"],
         "zero_as_missing": [],
+        "expected_n": 400, "expected_pos": 250,
+        # Declared schema (UCI variable table). sg/al/su are ordinal codes -> numeric.
+        "schema": {
+            "numeric": ["age", "bp", "sg", "al", "su", "bgr", "bu", "sc", "sod", "pot", "hemo", "pcv",
+                        "wbcc", "rbcc"],
+            "binary": {"rbc": ["normal", "abnormal"], "pc": ["normal", "abnormal"],
+                       "pcc": ["notpresent", "present"], "ba": ["notpresent", "present"],
+                       "htn": ["no", "yes"], "dm": ["no", "yes"], "cad": ["no", "yes"],
+                       "appet": ["good", "poor"], "pe": ["no", "yes"], "ane": ["no", "yes"]},
+            "aliases": {"wc": "wbcc", "rc": "rbcc"},
+        },
         "description": "Chronic Kidney Disease (UCI 336), ckd vs notckd, n=400.",
     },
 }
@@ -210,30 +228,64 @@ def load_dataset(name: str, allow_heldout: bool = False, pin_if_missing: bool = 
     if not raw_csv.exists():
         frame.to_csv(raw_csv, index=False, lineterminator="\n", encoding="utf-8")
 
+    meta_clean = {}
+    if "schema" in spec:  # non-ARFF source: row-wise cleaning against the declared schema
+        frame = frame.rename(columns=spec["schema"].get("aliases", {}))
+        for c in frame.columns:
+            if not pd.api.types.is_numeric_dtype(frame[c]):  # object or pandas 'str' dtype
+                s_ = frame[c].astype(object).where(frame[c].notna(), None)
+                s_ = s_.map(lambda t: None if t is None else str(t).strip().lower())
+                frame[c] = s_.where(~s_.isin(["?", "", "nan", "none"]) & s_.notna(), np.nan).astype(object)
     target = spec["target"]
     y_raw = frame[target].astype(str).str.strip()
     y = y_raw.isin(spec["positive"]).astype(int).to_numpy()
+    if "expected_n" in spec and (len(y) != spec["expected_n"] or int(y.sum()) != spec["expected_pos"]):
+        raise ChecksumError(f"{name}: n={len(y)}, positives={int(y.sum())} != registered "
+                            f"{spec['expected_n']}/{spec['expected_pos']} (positive-class code check)")
     X = frame.drop(columns=[target]).copy()
 
     for c in spec.get("zero_as_missing", []):
         X[c] = X[c].where(X[c] != 0, np.nan)
 
     numeric, binary, nominal, cats = [], [], [], {}
-    for c in X.columns:
-        if isinstance(X[c].dtype, pd.CategoricalDtype) or X[c].dtype == object:
-            declared = list(X[c].cat.categories) if isinstance(X[c].dtype, pd.CategoricalDtype) \
-                else None
-            if declared is None:  # non-ARFF source: no declared schema -> declare from registry later
-                declared = sorted(X[c].dropna().astype(str).unique().tolist())
-            X[c] = X[c].astype(object).where(X[c].notna(), np.nan)
-            cats[c] = declared
-            (binary if len(declared) == 2 else nominal).append(c)
-        else:
-            X[c] = pd.to_numeric(X[c], errors="coerce").astype(float)
+    if "schema" in spec:
+        sch = spec["schema"]
+        declared = set(sch["numeric"]) | set(sch["binary"]) | set(sch.get("nominal", {}))
+        if set(X.columns) != declared:
+            raise ChecksumError(f"{name}: columns {sorted(X.columns)} != declared schema {sorted(declared)}")
+        for c in sch["numeric"]:
+            v = pd.to_numeric(X[c], errors="coerce")
+            meta_clean[c] = int(v.isna().sum() - X[c].isna().sum())  # non-numeric tokens -> NaN
+            X[c] = v.astype(float)
             numeric.append(c)
+        for c, levels in sch["binary"].items():
+            bad = X[c].notna() & ~X[c].isin(levels)
+            meta_clean[c] = int(bad.sum())
+            X[c] = X[c].where(~bad, np.nan).astype(object)
+            cats[c] = list(levels)
+            binary.append(c)
+        for c, levels in sch.get("nominal", {}).items():
+            bad = X[c].notna() & ~X[c].isin(levels)
+            meta_clean[c] = int(bad.sum())
+            X[c] = X[c].where(~bad, np.nan).astype(object)
+            cats[c] = list(levels)
+            nominal.append(c)
+    else:
+        for c in X.columns:
+            if isinstance(X[c].dtype, pd.CategoricalDtype):
+                declared = list(X[c].cat.categories)
+                X[c] = X[c].astype(object).where(X[c].notna(), np.nan)
+                cats[c] = declared
+                (binary if len(declared) == 2 else nominal).append(c)
+            elif not pd.api.types.is_numeric_dtype(X[c]):
+                raise ChecksumError(f"{name}: column {c} has no declared schema")
+            else:
+                X[c] = pd.to_numeric(X[c], errors="coerce").astype(float)
+                numeric.append(c)
 
     return Dataset(
         name=name, X=X.reset_index(drop=True), y=y, numeric_cols=numeric, binary_cols=binary,
         nominal_cols=nominal, categories=cats, sha256=sha,
-        meta={k: v for k, v in spec.items() if k not in ("zero_as_missing",)},
+        meta={**{k: v for k, v in spec.items() if k not in ("zero_as_missing",)},
+              "coerced_to_missing": meta_clean},
     )

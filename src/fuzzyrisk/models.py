@@ -4,7 +4,7 @@
   1. fit the fuzzy-mode ``TabularPreprocessor`` (percentile scaling, imputation),
   2. evolve the knowledge base (NSGA-II or single-objective GA),
   3. pick one deployable model (preregistered epsilon-compact rule, MO only),
-  4. refit hybrid consequents on all given rows.
+  4. refit hybrid consequents on all given rows with the genome's inner-selected lambda.
 """
 from __future__ import annotations
 
@@ -12,15 +12,16 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 from .encoding import GenomeSpec
-from .optim import FitnessEvaluator, objective_scales, run_ga, run_nsga2, select_eps_compact
+from .optim import (LAMBDAS, FitnessEvaluator, objective_scales, run_ga, run_nsga2, select_best_brier,
+                    select_eps_compact)
 from .metrics import hypervolume, non_dominated_mask
 from .preprocessing import TabularPreprocessor
 
 
 class FuzzyRiskClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self, algorithm="nsga2", objectives=("auroc", "brier", "complexity"),
-                 consequents="hybrid", pop_size=60, n_gen=60, R_max=12, L_max=4,
-                 inner_folds=3, lam=1.0, select_eps=0.01, random_state=0,
+                 consequents="hybrid", pop_size=80, n_gen=80, R_max=12, L_max=4,
+                 inner_folds=3, lambdas=LAMBDAS, select_eps=0.01, random_state=0,
                  numeric_cols=(), binary_cols=(), nominal_cols=(), categories=None):
         self.algorithm = algorithm
         self.objectives = objectives
@@ -30,7 +31,7 @@ class FuzzyRiskClassifier(BaseEstimator, ClassifierMixin):
         self.R_max = R_max
         self.L_max = L_max
         self.inner_folds = inner_folds
-        self.lam = lam
+        self.lambdas = lambdas
         self.select_eps = select_eps
         self.random_state = random_state
         self.numeric_cols = numeric_cols
@@ -53,7 +54,7 @@ class FuzzyRiskClassifier(BaseEstimator, ClassifierMixin):
         mf_init = (np.quantile(Z[:, cont], [0.2, 0.5, 0.8], axis=0).T
                    if len(cont) else np.zeros((0, 3)))
         ev = FitnessEvaluator(self.spec_, Z, y, self.objectives, self.inner_folds,
-                              self.lam, seed=self.random_state)
+                              self.lambdas, seed=self.random_state)
         if self.algorithm == "nsga2":
             res = run_nsga2(ev, mf_init, self.pop_size, self.n_gen, seed=self.random_state)
         elif self.algorithm == "ga":
@@ -69,22 +70,26 @@ class FuzzyRiskClassifier(BaseEstimator, ClassifierMixin):
         self.n_evals_ = res["n_evals"]
         if self.algorithm == "nsga2":
             idx = select_eps_compact(self.front_metrics_, self.select_eps)
+            self.best_brier_index_ = select_best_brier(self.front_metrics_)
             scales = objective_scales(self.objectives, self.spec_)
             Fn = self.front_F_ / np.asarray(scales)
             self.inner_hv_ = hypervolume(Fn[non_dominated_mask(Fn)], np.ones(Fn.shape[1]))
         else:
             idx = 0
+            self.best_brier_index_ = 0
             self.inner_hv_ = float("nan")
         self.selected_index_ = idx
         self.Z_train_, self.y_train_ = Z, y
-        self.rulebase_ = self._finalise(self.front_X_[idx])
+        self.rulebase_ = self._finalise(idx)
         return self
 
-    def _finalise(self, x):
-        rb, _ = self.spec_.decode(x)
+    def _finalise(self, i):
+        """Decode archive member i and refit its consequents on all training rows,
+        using the lambda selected for that genome in the inner loop."""
+        rb, _ = self.spec_.decode(self.front_X_[i])
         if self.consequents == "hybrid":
             if rb.n_rules:
-                rb.fit_consequents(self.Z_train_, self.y_train_, lam=self.lam)
+                rb.fit_consequents(self.Z_train_, self.y_train_, lam=self.front_metrics_[i]["lam"])
             else:
                 pbar = np.clip(self.y_train_.mean(), 1e-6, 1 - 1e-6)
                 rb.bias, rb.weights = float(np.log(pbar / (1 - pbar))), np.zeros(0)
@@ -101,11 +106,10 @@ class FuzzyRiskClassifier(BaseEstimator, ClassifierMixin):
         """P(y=1) on X for every front member (consequents refitted on training rows).
         For Pareto analysis only; never used for model selection."""
         Z = self.prep_.transform(X)
-        out = []
-        for x in self.front_X_:
-            rb = self._finalise(x)
-            out.append(rb.predict_proba(Z)[:, 1])
-        return np.array(out)
+        return np.array([self._finalise(i).predict_proba(Z)[:, 1] for i in range(len(self.front_X_))])
+
+    def member_rulebase(self, i):
+        return self._finalise(i)
 
     # interpretability summary of the deployed model
     @property
@@ -118,7 +122,12 @@ class FuzzyRiskClassifier(BaseEstimator, ClassifierMixin):
 
     @property
     def complexity_(self):
+        """Total literals of the deployed rule base."""
         return self.rulebase_.complexity()
+
+    @property
+    def lambda_(self):
+        return self.front_metrics_[self.selected_index_].get("lam", float("nan"))
 
     def describe(self):
         return self.rulebase_.describe(self.prep_)
