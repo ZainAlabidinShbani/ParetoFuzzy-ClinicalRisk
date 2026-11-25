@@ -1,0 +1,172 @@
+
+=== session 2026-11-25T20:40:41+00:00 seed=0 folds=5 cfg={'pop_size': 60, 'n_gen': 80, 'n_iter': 20, 'R_max': 12, 'L_max': 4} fp=2ebe8f3d65b94f5b commit=1a82eff3 budget=8.0 min
+== pima_diabetes: n=768 prevalence=0.349 sha256=c1b530cb22b4
+  [pima_diabetes f0] LogReg                 AUROC=0.827 Brier=0.159 ECE=0.074 rules=nan fit=0.8s peakRSS=153MB
+  [pima_diabetes f0] DecisionTree           AUROC=0.753 Brier=0.183 ECE=0.035 rules=4 fit=0.9s peakRSS=154MB
+  [pima_diabetes f0] XGBoost                AUROC=0.808 Brier=0.166 ECE=0.048 rules=nan fit=11.6s peakRSS=264MB
+  [pima_diabetes f0] LightGBM               AUROC=0.816 Brier=0.168 ECE=0.082 rules=nan fit=9.0s peakRSS=269MB
+  [pima_diabetes f0] CatBoost               AUROC=0.829 Brier=0.158 ECE=0.035 rules=nan fit=69.3s peakRSS=284MB
+  [pima_diabetes f0] MLP                    AUROC=0.791 Brier=0.177 ECE=0.084 rules=nan fit=13.3s peakRSS=247MB
+  [pima_diabetes f0] XGBoost+Platt          AUROC=0.816 Brier=0.165 ECE=0.079 rules=nan fit=11.1s peakRSS=248MB
+  [pima_diabetes f0] XGBoost+Isotonic       AUROC=0.807 Brier=0.164 ECE=0.080 rules=nan fit=10.5s peakRSS=249MB
+  [pima_diabetes f0] SO-GA-Fuzzy(classic)   AUROC=0.777 Brier=0.187 ECE=0.114 rules=8 fit=18.9s peakRSS=250MB
+  [pima_diabetes f0] SO-GA-Fuzzy(hybrid)    AUROC=0.807 Brier=0.168 ECE=0.066 rules=12 fit=40.7s peakRSS=250MB
+  [pima_diabetes f0] MO-Fuzzy(NSGA-II)      AUROC=0.830 Brier=0.157 ECE=0.085 rules=4 fit=24.6s peakRSS=204MB
+  -- fold 0 done: peak RSS 284 MB, RSS after gc 194 MB, system available 2639 MB
+  [pima_diabetes f1] LogReg                 AUROC=0.801 Brier=0.173 ECE=0.056 rules=nan fit=1.0s peakRSS=194MB
+  [pima_diabetes f1] DecisionTree           AUROC=0.815 Brier=0.162 ECE=0.056 rules=7 fit=0.8s peakRSS=194MB
+  [pima_diabetes f1] XGBoost                AUROC=0.813 Brier=0.164 ECE=0.072 rules=nan fit=9.1s peakRSS=194MB
+  [pima_diabetes f1] LightGBM               AUROC=0.821 Brier=0.163 ECE=0.111 rules=nan fit=7.9s peakRSS=182MB
+  [pima_diabetes f1] CatBoost               AUROC=0.805 Brier=0.170 ECE=0.084 rules=nan fit=67.0s peakRSS=180MB
+  [pima_diabetes f1] MLP                    AUROC=0.766 Brier=0.188 ECE=0.085 rules=nan fit=8.0s peakRSS=175MB
+  [pima_diabetes f1] XGBoost+Platt          AUROC=0.807 Brier=0.167 ECE=0.084 rules=nan fit=11.3s peakRSS=175MB
+  [pima_diabetes f1] XGBoost+Isotonic       AUROC=0.809 Brier=0.168 ECE=0.118 rules=nan fit=11.2s peakRSS=174MB
+  [pima_diabetes f1] SO-GA-Fuzzy(classic)   AUROC=0.759 Brier=0.184 ECE=0.108 rules=9 fit=18.7s peakRSS=174MB
+  [pima_diabetes f1] SO-GA-Fuzzy(hybrid)    AUROC=0.806 Brier=0.171 ECE=0.131 rules=11 fit=40.4s peakRSS=174MB
+  [pima_diabetes f1] MO-Fuzzy(NSGA-II)      AUROC=0.811 Brier=0.167 ECE=0.060 rules=3 fit=25.8s peakRSS=173MB
+  -- fold 1 done: peak RSS 194 MB, RSS after gc 173 MB, system available 2073 MB
+  [pima_diabetes f2] LogReg                 AUROC=0.833 Brier=0.160 ECE=0.071 rules=nan fit=0.7s peakRSS=173MB
+  [pima_diabetes f2] DecisionTree           AUROC=0.747 Brier=0.183 ECE=0.042 rules=4 fit=0.9s peakRSS=173MB
+  [pima_diabetes f2] XGBoost                AUROC=0.840 Brier=0.159 ECE=0.114 rules=nan fit=9.8s peakRSS=173MB
+  [pima_diabetes f2] LightGBM               AUROC=0.833 Brier=0.162 ECE=0.092 rules=nan fit=8.1s peakRSS=175MB
+  [pima_diabetes f2] CatBoost               AUROC=0.834 Brier=0.161 ECE=0.075 rules=nan fit=64.3s peakRSS=174MB
+session end: budget; ran 27 fits in 8.3 min; 27 checkpoints on disk; process peak working set 284.3 MB
+
+=== session 2026-11-25T20:49:14+00:00 seed=0 folds=5 cfg={'pop_size': 60, 'n_gen': 80, 'n_iter': 20, 'R_max': 12, 'L_max': 4} fp=2ebe8f3d65b94f5b commit=1a82eff3 budget=8.0 min
+== pima_diabetes: n=768 prevalence=0.349 sha256=c1b530cb22b4
+  [pima_diabetes f2] MLP                    AUROC=0.789 Brier=0.190 ECE=0.091 rules=nan fit=8.1s peakRSS=154MB
+  [pima_diabetes f2] XGBoost+Platt          AUROC=0.843 Brier=0.160 ECE=0.082 rules=nan fit=10.4s peakRSS=264MB
+  [pima_diabetes f2] XGBoost+Isotonic       AUROC=0.840 Brier=0.160 ECE=0.102 rules=nan fit=9.7s peakRSS=265MB
+  [pima_diabetes f2] SO-GA-Fuzzy(classic)   AUROC=0.752 Brier=0.198 ECE=0.104 rules=6 fit=18.1s peakRSS=265MB
+  [pima_diabetes f2] SO-GA-Fuzzy(hybrid)    AUROC=0.833 Brier=0.159 ECE=0.109 rules=12 fit=45.5s peakRSS=265MB
+  [pima_diabetes f2] MO-Fuzzy(NSGA-II)      AUROC=0.833 Brier=0.162 ECE=0.072 rules=3 fit=27.5s peakRSS=266MB
+  -- fold 2 done: peak RSS 266 MB, RSS after gc 266 MB, system available 1701 MB
+  [pima_diabetes f3] LogReg                 AUROC=0.892 Brier=0.128 ECE=0.084 rules=nan fit=0.6s peakRSS=266MB
+  [pima_diabetes f3] DecisionTree           AUROC=0.848 Brier=0.142 ECE=0.035 rules=7 fit=0.8s peakRSS=266MB
+  [pima_diabetes f3] XGBoost                AUROC=0.900 Brier=0.131 ECE=0.102 rules=nan fit=9.6s peakRSS=267MB
+  [pima_diabetes f3] LightGBM               AUROC=0.900 Brier=0.124 ECE=0.077 rules=nan fit=8.5s peakRSS=271MB
+  [pima_diabetes f3] CatBoost               AUROC=0.896 Brier=0.128 ECE=0.064 rules=nan fit=64.4s peakRSS=285MB
+  [pima_diabetes f3] MLP                    AUROC=0.878 Brier=0.139 ECE=0.090 rules=nan fit=7.3s peakRSS=199MB
+  [pima_diabetes f3] XGBoost+Platt          AUROC=0.908 Brier=0.129 ECE=0.097 rules=nan fit=9.9s peakRSS=182MB
+  [pima_diabetes f3] XGBoost+Isotonic       AUROC=0.911 Brier=0.125 ECE=0.084 rules=nan fit=9.8s peakRSS=183MB
+  [pima_diabetes f3] SO-GA-Fuzzy(classic)   AUROC=0.878 Brier=0.136 ECE=0.110 rules=8 fit=18.0s peakRSS=182MB
+  [pima_diabetes f3] SO-GA-Fuzzy(hybrid)    AUROC=0.894 Brier=0.130 ECE=0.061 rules=9 fit=41.8s peakRSS=181MB
+  [pima_diabetes f3] MO-Fuzzy(NSGA-II)      AUROC=0.924 Brier=0.117 ECE=0.101 rules=3 fit=25.5s peakRSS=180MB
+  -- fold 3 done: peak RSS 285 MB, RSS after gc 180 MB, system available 1748 MB
+  [pima_diabetes f4] LogReg                 AUROC=0.825 Brier=0.160 ECE=0.051 rules=nan fit=0.7s peakRSS=180MB
+  [pima_diabetes f4] DecisionTree           AUROC=0.723 Brier=0.190 ECE=0.057 rules=4 fit=0.9s peakRSS=180MB
+  [pima_diabetes f4] XGBoost                AUROC=0.775 Brier=0.184 ECE=0.092 rules=nan fit=9.3s peakRSS=180MB
+  [pima_diabetes f4] LightGBM               AUROC=0.797 Brier=0.173 ECE=0.107 rules=nan fit=9.0s peakRSS=181MB
+  [pima_diabetes f4] CatBoost               AUROC=0.828 Brier=0.158 ECE=0.034 rules=nan fit=64.2s peakRSS=178MB
+  [pima_diabetes f4] MLP                    AUROC=0.828 Brier=0.157 ECE=0.054 rules=nan fit=8.0s peakRSS=175MB
+  [pima_diabetes f4] XGBoost+Platt          AUROC=0.809 Brier=0.168 ECE=0.046 rules=nan fit=9.8s peakRSS=175MB
+  [pima_diabetes f4] XGBoost+Isotonic       AUROC=0.819 Brier=0.164 ECE=0.069 rules=nan fit=9.8s peakRSS=175MB
+  [pima_diabetes f4] SO-GA-Fuzzy(classic)   AUROC=0.686 Brier=0.229 ECE=0.205 rules=7 fit=16.5s peakRSS=175MB
+  [pima_diabetes f4] SO-GA-Fuzzy(hybrid)    AUROC=0.812 Brier=0.166 ECE=0.081 rules=10 fit=41.4s peakRSS=175MB
+session end: budget; ran 27 fits in 8.2 min; 54 checkpoints on disk; process peak working set 285.3 MB
+
+=== session 2026-11-25T20:57:35+00:00 seed=0 folds=5 cfg={'pop_size': 60, 'n_gen': 80, 'n_iter': 20, 'R_max': 12, 'L_max': 4} fp=2ebe8f3d65b94f5b commit=1a82eff3 budget=8.0 min
+== pima_diabetes: n=768 prevalence=0.349 sha256=c1b530cb22b4
+  [pima_diabetes f4] MO-Fuzzy(NSGA-II)      AUROC=0.824 Brier=0.161 ECE=0.078 rules=4 fit=29.0s peakRSS=155MB
+  -- fold 4 done: peak RSS 155 MB, RSS after gc 155 MB, system available 1650 MB
+== heart_cleveland: n=303 prevalence=0.455 sha256=8148e6430422
+  [heart_cleveland f0] LogReg                 AUROC=0.911 Brier=0.117 ECE=0.073 rules=nan fit=2.1s peakRSS=155MB
+  [heart_cleveland f0] DecisionTree           AUROC=0.808 Brier=0.172 ECE=0.077 rules=4 fit=2.4s peakRSS=156MB
+  [heart_cleveland f0] XGBoost                AUROC=0.902 Brier=0.130 ECE=0.118 rules=nan fit=7.6s peakRSS=265MB
+  [heart_cleveland f0] LightGBM               AUROC=0.900 Brier=0.129 ECE=0.128 rules=nan fit=6.2s peakRSS=268MB
+  [heart_cleveland f0] CatBoost               AUROC=0.905 Brier=0.126 ECE=0.131 rules=nan fit=58.0s peakRSS=285MB
+  [heart_cleveland f0] MLP                    AUROC=0.908 Brier=0.131 ECE=0.119 rules=nan fit=8.2s peakRSS=285MB
+  [heart_cleveland f0] XGBoost+Platt          AUROC=0.896 Brier=0.131 ECE=0.132 rules=nan fit=8.1s peakRSS=286MB
+  [heart_cleveland f0] XGBoost+Isotonic       AUROC=0.900 Brier=0.124 ECE=0.096 rules=nan fit=7.4s peakRSS=286MB
+  [heart_cleveland f0] SO-GA-Fuzzy(classic)   AUROC=0.872 Brier=0.146 ECE=0.115 rules=9 fit=16.2s peakRSS=286MB
+  [heart_cleveland f0] SO-GA-Fuzzy(hybrid)    AUROC=0.874 Brier=0.135 ECE=0.100 rules=11 fit=31.8s peakRSS=286MB
+  [heart_cleveland f0] MO-Fuzzy(NSGA-II)      AUROC=0.891 Brier=0.131 ECE=0.128 rules=5 fit=27.4s peakRSS=275MB
+  -- fold 0 done: peak RSS 286 MB, RSS after gc 249 MB, system available 1968 MB
+  [heart_cleveland f1] LogReg                 AUROC=0.892 Brier=0.130 ECE=0.102 rules=nan fit=1.7s peakRSS=249MB
+  [heart_cleveland f1] DecisionTree           AUROC=0.713 Brier=0.227 ECE=0.143 rules=4 fit=2.1s peakRSS=249MB
+  [heart_cleveland f1] XGBoost                AUROC=0.880 Brier=0.138 ECE=0.066 rules=nan fit=7.1s peakRSS=249MB
+  [heart_cleveland f1] LightGBM               AUROC=0.895 Brier=0.129 ECE=0.120 rules=nan fit=6.1s peakRSS=250MB
+  [heart_cleveland f1] CatBoost               AUROC=0.908 Brier=0.124 ECE=0.159 rules=nan fit=55.1s peakRSS=234MB
+  [heart_cleveland f1] MLP                    AUROC=0.808 Brier=0.169 ECE=0.122 rules=nan fit=7.3s peakRSS=178MB
+  [heart_cleveland f1] XGBoost+Platt          AUROC=0.893 Brier=0.134 ECE=0.111 rules=nan fit=7.9s peakRSS=176MB
+  [heart_cleveland f1] XGBoost+Isotonic       AUROC=0.890 Brier=0.134 ECE=0.103 rules=nan fit=7.7s peakRSS=176MB
+  [heart_cleveland f1] SO-GA-Fuzzy(classic)   AUROC=0.880 Brier=0.138 ECE=0.144 rules=9 fit=17.2s peakRSS=176MB
+  [heart_cleveland f1] SO-GA-Fuzzy(hybrid)    AUROC=0.823 Brier=0.166 ECE=0.130 rules=12 fit=36.9s peakRSS=176MB
+  [heart_cleveland f1] MO-Fuzzy(NSGA-II)      AUROC=0.807 Brier=0.171 ECE=0.157 rules=5 fit=30.5s peakRSS=176MB
+  -- fold 1 done: peak RSS 250 MB, RSS after gc 175 MB, system available 2349 MB
+  [heart_cleveland f2] LogReg                 AUROC=0.924 Brier=0.116 ECE=0.060 rules=nan fit=2.3s peakRSS=175MB
+  [heart_cleveland f2] DecisionTree           AUROC=0.839 Brier=0.153 ECE=0.079 rules=4 fit=2.3s peakRSS=175MB
+  [heart_cleveland f2] XGBoost                AUROC=0.925 Brier=0.109 ECE=0.112 rules=nan fit=7.3s peakRSS=175MB
+  [heart_cleveland f2] LightGBM               AUROC=0.923 Brier=0.106 ECE=0.088 rules=nan fit=6.4s peakRSS=176MB
+  [heart_cleveland f2] CatBoost               AUROC=0.918 Brier=0.110 ECE=0.083 rules=nan fit=57.6s peakRSS=175MB
+  [heart_cleveland f2] MLP                    AUROC=0.920 Brier=0.134 ECE=0.168 rules=nan fit=8.2s peakRSS=174MB
+  [heart_cleveland f2] XGBoost+Platt          AUROC=0.923 Brier=0.106 ECE=0.107 rules=nan fit=8.1s peakRSS=174MB
+session end: budget; ran 30 fits in 8.0 min; 84 checkpoints on disk; process peak working set 286.4 MB
+
+=== session 2026-11-25T21:05:49+00:00 seed=0 folds=5 cfg={'pop_size': 60, 'n_gen': 80, 'n_iter': 20, 'R_max': 12, 'L_max': 4} fp=2ebe8f3d65b94f5b commit=1a82eff3 budget=8.0 min
+== pima_diabetes: n=768 prevalence=0.349 sha256=c1b530cb22b4
+== heart_cleveland: n=303 prevalence=0.455 sha256=8148e6430422
+  [heart_cleveland f2] XGBoost+Isotonic       AUROC=0.923 Brier=0.109 ECE=0.077 rules=nan fit=8.7s peakRSS=263MB
+  [heart_cleveland f2] SO-GA-Fuzzy(classic)   AUROC=0.898 Brier=0.132 ECE=0.137 rules=10 fit=16.1s peakRSS=264MB
+  [heart_cleveland f2] SO-GA-Fuzzy(hybrid)    AUROC=0.892 Brier=0.136 ECE=0.132 rules=11 fit=36.8s peakRSS=264MB
+  [heart_cleveland f2] MO-Fuzzy(NSGA-II)      AUROC=0.929 Brier=0.103 ECE=0.097 rules=5 fit=27.8s peakRSS=264MB
+  -- fold 2 done: peak RSS 264 MB, RSS after gc 264 MB, system available 2386 MB
+  [heart_cleveland f3] LogReg                 AUROC=0.949 Brier=0.099 ECE=0.125 rules=nan fit=2.0s peakRSS=264MB
+  [heart_cleveland f3] DecisionTree           AUROC=0.794 Brier=0.176 ECE=0.069 rules=4 fit=2.0s peakRSS=264MB
+  [heart_cleveland f3] XGBoost                AUROC=0.927 Brier=0.110 ECE=0.100 rules=nan fit=6.9s peakRSS=266MB
+  [heart_cleveland f3] LightGBM               AUROC=0.908 Brier=0.114 ECE=0.070 rules=nan fit=5.8s peakRSS=269MB
+  [heart_cleveland f3] CatBoost               AUROC=0.929 Brier=0.120 ECE=0.090 rules=nan fit=52.1s peakRSS=285MB
+  [heart_cleveland f3] MLP                    AUROC=0.948 Brier=0.092 ECE=0.082 rules=nan fit=7.1s peakRSS=279MB
+  [heart_cleveland f3] XGBoost+Platt          AUROC=0.921 Brier=0.113 ECE=0.109 rules=nan fit=7.2s peakRSS=275MB
+  [heart_cleveland f3] XGBoost+Isotonic       AUROC=0.917 Brier=0.115 ECE=0.045 rules=nan fit=7.1s peakRSS=251MB
+  [heart_cleveland f3] SO-GA-Fuzzy(classic)   AUROC=0.925 Brier=0.124 ECE=0.096 rules=9 fit=15.8s peakRSS=251MB
+  [heart_cleveland f3] SO-GA-Fuzzy(hybrid)    AUROC=0.912 Brier=0.130 ECE=0.104 rules=12 fit=32.6s peakRSS=251MB
+  [heart_cleveland f3] MO-Fuzzy(NSGA-II)      AUROC=0.905 Brier=0.128 ECE=0.088 rules=5 fit=26.3s peakRSS=199MB
+  -- fold 3 done: peak RSS 285 MB, RSS after gc 199 MB, system available 2521 MB
+  [heart_cleveland f4] LogReg                 AUROC=0.900 Brier=0.117 ECE=0.071 rules=nan fit=2.0s peakRSS=199MB
+  [heart_cleveland f4] DecisionTree           AUROC=0.729 Brier=0.236 ECE=0.118 rules=4 fit=2.1s peakRSS=199MB
+  [heart_cleveland f4] XGBoost                AUROC=0.883 Brier=0.147 ECE=0.103 rules=nan fit=7.4s peakRSS=181MB
+  [heart_cleveland f4] LightGBM               AUROC=0.886 Brier=0.133 ECE=0.106 rules=nan fit=6.4s peakRSS=181MB
+  [heart_cleveland f4] CatBoost               AUROC=0.903 Brier=0.123 ECE=0.100 rules=nan fit=53.1s peakRSS=180MB
+  [heart_cleveland f4] MLP                    AUROC=0.899 Brier=0.126 ECE=0.121 rules=nan fit=8.3s peakRSS=177MB
+  [heart_cleveland f4] XGBoost+Platt          AUROC=0.866 Brier=0.151 ECE=0.177 rules=nan fit=7.5s peakRSS=178MB
+  [heart_cleveland f4] XGBoost+Isotonic       AUROC=0.853 Brier=0.170 ECE=0.130 rules=nan fit=7.3s peakRSS=178MB
+  [heart_cleveland f4] SO-GA-Fuzzy(classic)   AUROC=0.928 Brier=0.100 ECE=0.125 rules=10 fit=16.4s peakRSS=178MB
+  [heart_cleveland f4] SO-GA-Fuzzy(hybrid)    AUROC=0.905 Brier=0.126 ECE=0.110 rules=11 fit=35.0s peakRSS=178MB
+  [heart_cleveland f4] MO-Fuzzy(NSGA-II)      AUROC=0.933 Brier=0.098 ECE=0.131 rules=5 fit=25.3s peakRSS=177MB
+  -- fold 4 done: peak RSS 199 MB, RSS after gc 176 MB, system available 2362 MB
+session end: complete; ran 26 fits in 7.2 min; 110 checkpoints on disk; process peak working set 285.3 MB
+aggregated 110 fits -> D:\Github\FuzzyGA-HealthAI\results\pilot
+
+### pima_diabetes (seed 0, 5-fold outer CV; mean ± SD over folds)
+
+| Model | AUROC | PR-AUC | Brier | ECE | Cal. slope | Rules | Ante/rule | Fit s | Peak RSS MB |
+|---|---|---|---|---|---|---|---|---|---|
+| LogReg | 0.836 ± 0.034 | 0.729 ± 0.052 | 0.156 ± 0.017 | 0.067 ± 0.014 | 1.04 ± 0.25 | – | – | 0.7 ± 0.1 | 266 |
+| DecisionTree | 0.777 ± 0.052 | 0.610 ± 0.071 | 0.172 ± 0.020 | 0.045 ± 0.011 | 0.87 ± 0.27 | 5.2 ± 1.6 | 2.34 ± 0.47 | 0.8 ± 0.0 | 266 |
+| XGBoost | 0.827 ± 0.047 | 0.714 ± 0.067 | 0.161 ± 0.019 | 0.086 ± 0.026 | 1.05 ± 0.41 | – | – | 9.9 ± 1.0 | 267 |
+| LightGBM | 0.833 ± 0.040 | 0.713 ± 0.066 | 0.158 ± 0.020 | 0.094 ± 0.015 | 0.92 ± 0.26 | – | – | 8.5 ± 0.5 | 271 |
+| CatBoost | 0.839 ± 0.034 | 0.726 ± 0.053 | 0.155 ± 0.016 | 0.059 ± 0.023 | 1.06 ± 0.26 | – | – | 65.8 ± 2.3 | 285 |
+| MLP | 0.810 ± 0.044 | 0.685 ± 0.078 | 0.170 ± 0.022 | 0.081 ± 0.015 | 1.19 ± 0.33 | – | – | 9.0 ± 2.5 | 247 |
+| XGBoost+Platt | 0.837 ± 0.043 | 0.720 ± 0.070 | 0.158 ± 0.017 | 0.077 ± 0.019 | 1.18 ± 0.35 | – | – | 10.5 ± 0.7 | 264 |
+| XGBoost+Isotonic | 0.837 ± 0.043 | 0.723 ± 0.070 | 0.156 ± 0.018 | 0.091 ± 0.019 | 0.98 ± 0.52 | – | – | 10.2 ± 0.7 | 265 |
+| SO-GA-Fuzzy(classic) | 0.771 ± 0.069 | 0.668 ± 0.080 | 0.187 ± 0.033 | 0.128 ± 0.043 | 1.00 ± 0.29 | 7.6 ± 1.1 | 1.91 ± 0.37 | 18.0 ± 0.9 | 265 |
+| SO-GA-Fuzzy(hybrid) | 0.830 ± 0.037 | 0.708 ± 0.058 | 0.159 ± 0.017 | 0.089 ± 0.030 | 0.98 ± 0.28 | 10.8 ± 1.3 | 1.96 ± 0.38 | 41.9 ± 2.0 | 265 |
+| MO-Fuzzy(NSGA-II) | 0.844 ± 0.045 | 0.735 ± 0.081 | 0.153 ± 0.020 | 0.079 ± 0.015 | 1.17 ± 0.46 | 3.4 ± 0.5 | 1.00 ± 0.00 | 26.5 ± 1.8 | 266 |
+
+### heart_cleveland (seed 0, 5-fold outer CV; mean ± SD over folds)
+
+| Model | AUROC | PR-AUC | Brier | ECE | Cal. slope | Rules | Ante/rule | Fit s | Peak RSS MB |
+|---|---|---|---|---|---|---|---|---|---|
+| LogReg | 0.915 ± 0.023 | 0.909 ± 0.015 | 0.116 ± 0.011 | 0.086 ± 0.027 | 1.10 ± 0.18 | – | – | 2.0 ± 0.2 | 264 |
+| DecisionTree | 0.777 ± 0.054 | 0.707 ± 0.092 | 0.193 ± 0.037 | 0.097 ± 0.032 | 0.66 ± 0.19 | 4.0 ± 0.0 | 2.00 ± 0.00 | 2.2 ± 0.1 | 264 |
+| XGBoost | 0.903 ± 0.022 | 0.900 ± 0.018 | 0.127 ± 0.017 | 0.100 ± 0.020 | 0.96 ± 0.21 | – | – | 7.3 ± 0.3 | 266 |
+| LightGBM | 0.902 ± 0.014 | 0.899 ± 0.019 | 0.122 ± 0.012 | 0.103 ± 0.023 | 1.01 ± 0.17 | – | – | 6.2 ± 0.3 | 269 |
+| CatBoost | 0.913 ± 0.011 | 0.909 ± 0.017 | 0.121 ± 0.006 | 0.112 ± 0.032 | 1.20 ± 0.27 | – | – | 55.2 ± 2.6 | 285 |
+| MLP | 0.897 ± 0.053 | 0.903 ± 0.035 | 0.131 ± 0.027 | 0.122 ± 0.031 | 1.67 ± 0.53 | – | – | 7.8 ± 0.5 | 285 |
+| XGBoost+Platt | 0.900 ± 0.023 | 0.898 ± 0.023 | 0.127 ± 0.018 | 0.127 ± 0.029 | 1.21 ± 0.26 | – | – | 7.7 ± 0.4 | 286 |
+| XGBoost+Isotonic | 0.897 ± 0.028 | 0.890 ± 0.029 | 0.130 ± 0.024 | 0.090 ± 0.031 | 0.79 ± 0.46 | – | – | 7.6 ± 0.6 | 286 |
+| SO-GA-Fuzzy(classic) | 0.901 ± 0.026 | 0.894 ± 0.023 | 0.128 ± 0.018 | 0.123 ± 0.019 | 0.87 ± 0.29 | 9.4 ± 0.5 | 1.98 ± 0.16 | 16.3 ± 0.5 | 286 |
+| SO-GA-Fuzzy(hybrid) | 0.881 ± 0.036 | 0.869 ± 0.049 | 0.139 ± 0.016 | 0.115 ± 0.015 | 0.81 ± 0.11 | 11.4 ± 0.5 | 2.35 ± 0.15 | 34.6 ± 2.3 | 286 |
+| MO-Fuzzy(NSGA-II) | 0.893 ± 0.051 | 0.877 ± 0.059 | 0.126 ± 0.029 | 0.120 ± 0.028 | 0.97 ± 0.19 | 5.0 ± 0.0 | 1.20 ± 0.24 | 27.5 ± 1.9 | 275 |
+

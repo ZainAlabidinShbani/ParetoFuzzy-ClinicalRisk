@@ -1,0 +1,38 @@
+[
+ {
+  "start_utc": "2026-11-25T20:40:41+00:00",
+  "wall_s": 499.9,
+  "fits_run": 27,
+  "status": "budget",
+  "peak_working_set_mb": 284.3,
+  "git_commit": "1a82eff3a667f4ffad78ed2db0f995094792770e",
+  "git_dirty": false
+ },
+ {
+  "start_utc": "2026-11-25T20:49:14+00:00",
+  "wall_s": 489.0,
+  "fits_run": 27,
+  "status": "budget",
+  "peak_working_set_mb": 285.3,
+  "git_commit": "1a82eff3a667f4ffad78ed2db0f995094792770e",
+  "git_dirty": false
+ },
+ {
+  "start_utc": "2026-11-25T20:57:35+00:00",
+  "wall_s": 481.9,
+  "fits_run": 30,
+  "status": "budget",
+  "peak_working_set_mb": 286.4,
+  "git_commit": "1a82eff3a667f4ffad78ed2db0f995094792770e",
+  "git_dirty": false
+ },
+ {
+  "start_utc": "2026-11-25T21:05:49+00:00",
+  "wall_s": 431.1,
+  "fits_run": 26,
+  "status": "complete",
+  "peak_working_set_mb": 285.3,
+  "git_commit": "1a82eff3a667f4ffad78ed2db0f995094792770e",
+  "git_dirty": false
+ }
+]

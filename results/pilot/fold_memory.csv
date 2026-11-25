@@ -1,0 +1,11 @@
+dataset,fold,n_fits,fold_peak_rss_mb,rss_after_gc_mb,fold_fit_s,system_available_mb
+pima_diabetes,0,11,284.3,193.5,210.8,2639
+pima_diabetes,1,11,193.8,172.7,201.3,2073
+pima_diabetes,2,6,265.6,265.6,119.4,1701
+pima_diabetes,3,11,285.3,179.8,196.2,1748
+pima_diabetes,4,1,154.9,154.9,29.0,1650
+heart_cleveland,0,11,286.4,249.3,175.4,1968
+heart_cleveland,1,11,250.3,175.1,179.6,2349
+heart_cleveland,2,4,263.9,263.9,89.3,2386
+heart_cleveland,3,11,285.3,199.3,165.0,2521
+heart_cleveland,4,11,199.3,175.9,170.9,2362
