@@ -22,7 +22,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 from .preprocessing import TabularPreprocessor
 
-N_JOBS_MODEL = 2  # bounded threading (16 GB RAM laptop)
+N_JOBS_MODEL = 1  # strict memory hygiene: single-threaded models (16 GB RAM laptop)
 
 BASELINES = ("logreg", "dtree", "xgboost", "lightgbm", "catboost", "mlp")
 

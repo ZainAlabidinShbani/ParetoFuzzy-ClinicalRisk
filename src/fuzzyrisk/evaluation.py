@@ -104,41 +104,71 @@ def _test_front(model: FuzzyRiskClassifier, X_te, y_te) -> dict:
             "selected_index": model.selected_index_}
 
 
+def fit_one(ds: Dataset, name: str, fold: int, tr, te, seed: int, cfg: dict, spy=None) -> dict:
+    """Fit one model on one outer fold; return a JSON-serialisable payload."""
+    X_tr, X_te = ds.X.iloc[tr], ds.X.iloc[te]
+    y_tr, y_te = ds.y[tr], ds.y[te]
+    model = model_factory(name, ds, seed, cfg)
+    if spy is not None:
+        spy(name, fold, X_tr, X_te, model)
+    with PeakRSS() as mon:
+        t0 = time.perf_counter()
+        model.fit(X_tr, y_tr)
+        fit_s = time.perf_counter() - t0
+    t0 = time.perf_counter()
+    p = model.predict_proba(X_te)[:, 1]
+    pred_s = time.perf_counter() - t0
+    rec = {"dataset": ds.name, "seed": seed, "fold": fold, "model": name,
+           "n_train": len(tr), "n_test": len(te), **all_metrics(y_te, p), **_complexity(model),
+           "fit_s": fit_s, "predict_s": pred_s, "peak_rss_mb": mon.peak_mb,
+           "rss_delta_mb": mon.peak_mb - mon.start_mb}
+    front = rules = None
+    if isinstance(model, FuzzyRiskClassifier) and model.algorithm == "nsga2":
+        fr = _test_front(model, X_te, y_te)
+        rec["test_hv"] = fr["test_hv"]
+        front = {"dataset": ds.name, "seed": seed, "fold": fold, "model": name, **fr,
+                 "hv_history": list(model.hv_history_)}
+    if isinstance(model, FuzzyRiskClassifier):
+        rules = {"dataset": ds.name, "seed": seed, "fold": fold, "model": name, "rules": model.describe()}
+    rec = {k: (v.item() if isinstance(v, np.generic) else v) for k, v in rec.items()}
+    pred = {"row": [int(r) for r in te], "y": [int(v) for v in y_te], "p": [float(v) for v in p]}
+    del model
+    return {"record": rec, "pred": pred, "front": front, "rules": rules}
+
+
 def run_cv(ds: Dataset, models: list[str], seed: int = 0, n_folds: int = 5, cfg: dict | None = None,
-           log=print, spy=None):
-    """Run outer stratified K-fold CV for each model. Returns (records, predictions, fronts, rules)."""
+           log=print, spy=None, skip=None, on_result=None, on_fold_end=None):
+    """Run outer stratified K-fold CV for each model.
+
+    skip(dataset, fold, model) -> bool : return True to skip an already-completed fit
+    on_result(payload)                 : called immediately after each completed fit
+    on_fold_end(fold, fold_payloads)   : called after each fold (e.g. gc + memory logging)
+    Returns (records, predictions, fronts, rules) for the fits run in this call.
+    """
     cfg = cfg or {}
     skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
     records, preds, fronts, rules = [], [], [], []
     for fold, (tr, te) in enumerate(skf.split(ds.X, ds.y)):
-        X_tr, X_te = ds.X.iloc[tr], ds.X.iloc[te]
-        y_tr, y_te = ds.y[tr], ds.y[te]
+        fold_payloads = []
         for name in models:
-            model = model_factory(name, ds, seed, cfg)
-            if spy is not None:
-                spy(name, fold, X_tr, X_te, model)
-            with PeakRSS() as mon:
-                t0 = time.perf_counter()
-                model.fit(X_tr, y_tr)
-                fit_s = time.perf_counter() - t0
-            t0 = time.perf_counter()
-            p = model.predict_proba(X_te)[:, 1]
-            pred_s = time.perf_counter() - t0
-            rec = {"dataset": ds.name, "seed": seed, "fold": fold, "model": name,
-                   "n_train": len(tr), "n_test": len(te), **all_metrics(y_te, p), **_complexity(model),
-                   "fit_s": fit_s, "predict_s": pred_s, "peak_rss_mb": mon.peak_mb,
-                   "rss_delta_mb": mon.peak_mb - mon.start_mb}
-            if isinstance(model, FuzzyRiskClassifier) and model.algorithm == "nsga2":
-                fr = _test_front(model, X_te, y_te)
-                rec["test_hv"] = fr["test_hv"]
-                fronts.append({"dataset": ds.name, "seed": seed, "fold": fold, "model": name, **fr,
-                               "hv_history": model.hv_history_})
-            if isinstance(model, FuzzyRiskClassifier):
-                rules.append({"dataset": ds.name, "seed": seed, "fold": fold, "model": name,
-                              "rules": model.describe()})
+            if skip is not None and skip(ds.name, fold, name):
+                continue
+            pl = fit_one(ds, name, fold, tr, te, seed, cfg, spy)
+            if on_result is not None:
+                on_result(pl)
+            fold_payloads.append(pl)
+            rec = pl["record"]
             records.append(rec)
             preds.append(pd.DataFrame({"dataset": ds.name, "seed": seed, "fold": fold, "model": name,
-                                       "row": te, "y": y_te, "p": p}))
+                                       **pl["pred"]}))
+            if pl["front"] is not None:
+                fronts.append(pl["front"])
+            if pl["rules"] is not None:
+                rules.append(pl["rules"])
             log(f"  [{ds.name} f{fold}] {name:<22} AUROC={rec['auroc']:.3f} Brier={rec['brier']:.3f} "
-                f"ECE={rec['ece']:.3f} rules={rec['n_rules']} fit={fit_s:.1f}s")
-    return records, pd.concat(preds, ignore_index=True), fronts, rules
+                f"ECE={rec['ece']:.3f} rules={rec['n_rules']} fit={rec['fit_s']:.1f}s "
+                f"peakRSS={rec['peak_rss_mb']:.0f}MB")
+        if on_fold_end is not None:
+            on_fold_end(fold, fold_payloads)
+    pred_df = pd.concat(preds, ignore_index=True) if preds else pd.DataFrame()
+    return records, pred_df, fronts, rules
