@@ -1,0 +1,84 @@
+\section{Experimental protocol and preregistration}
+\label{sec:protocol}
+
+\subsection{Datasets and the development/held-out split}
+Six public binary clinical datasets were used (Table~\ref{tab:datasets}). All come
+from OpenML~\cite{vanschoren2014} with the file md5 published by OpenML, except
+chronic kidney disease (UCI), whose sha256 was pinned at first download. Two
+\emph{development} datasets, Pima diabetes and Cleveland heart
+disease~\cite{detrano1989}, were used for every design decision, including the pilot
+that led to the refinements in Section~\ref{sec:method}. Four \emph{held-out}
+datasets (WDBC breast cancer, ILPD liver disease, thyroid ``sick'' and CKD) were
+selected from metadata only. The data loader refused to read them until the
+preregistration was locked. Positive classes were confirmed from the official dataset
+documentation and checked on load against the registered sample size and number of
+positives. Physiologically impossible zeros in Pima are a fixed row-wise rule and are
+set to missing before splitting.
+
+\input{tables/datasets}
+
+\subsection{Preregistration}
+Before any held-out file was downloaded, a preregistration was committed and tagged in
+the code repository. It fixed the datasets, positive classes, method configuration,
+baselines and search budgets, outer protocol, hypotheses H1--H4, the statistical
+analysis plan, and the SHA-256 hashes of all source, script, test and requirement
+files. Two deviations occurred, both of them engineering-only and documented with
+their reasons and new hashes. D1: a parser fallback was needed because the default
+ARFF parser fails under the installed pandas version for integer-like class labels.
+D2: a unit test that asserted the held-out files were absent was conditioned on the
+lock. Neither affects the method, the data or the metrics.
+
+\subsection{Models}
+Eleven models were compared. Logistic regression (L2) and a depth-limited decision
+tree were tuned by grid search. XGBoost~\cite{chen2016}, LightGBM~\cite{ke2017},
+CatBoost~\cite{prokhorenkova2018} and an MLP (scikit-learn~\cite{pedregosa2011}) were
+tuned by a 20-iteration random search. XGBoost was also combined with post-hoc
+Platt and isotonic calibration~\cite{zadrozny2002,niculescu2005}. All tuning used inner
+stratified 3-fold cross-validation with log-loss scoring, so tuning itself
+favoured calibration as much as discrimination. Two single-objective genetic-fuzzy
+baselines share the encoding, operators and budget of the proposed model:
+SO-GA-Fuzzy (classic), with evolved consequents and training accuracy as fitness,
+represents prior practice; SO-GA-Fuzzy (hybrid), with the hybrid consequents of
+\eqref{eq:consequents} and inner AUROC as fitness, isolates the effect of the
+multi-objective search. The proposed MO-Fuzzy (NSGA-II) is described in
+Section~\ref{sec:method}.
+
+\subsection{Leakage-free evaluation}
+Each dataset was evaluated by stratified 5-fold cross-validation repeated with
+\resNSeeds{} seeds, giving \resFoldsPerDataset{} outer test folds per dataset and
+model. Every fitted operation (imputation, scaling, one-hot encoding, tuning,
+evolutionary search, $\lambda$ selection and operating-point selection) runs inside the
+outer training fold, which addresses selection bias~\cite{cawley2010} and
+leakage~\cite{kaufman2012}. Unit tests check that splits are disjoint and exhaustive;
+that every estimator is fitted only on training rows (a spy records the rows passed to
+\texttt{fit}); that fitted preprocessing does not change when test rows are
+perturbed; that predictions are row-independent; that probabilities are valid; that
+results are deterministic under seeding; and that Pareto non-dominance and hypervolume
+are computed correctly.
+
+\subsection{Metrics and statistics}
+Discrimination is measured by AUROC and PR-AUC~\cite{saito2015}. Calibration is
+measured by the Brier score~\cite{brier1950}, log-loss, ECE with 10 equal-width
+bins~\cite{naeini2015,guo2017}, adaptive ECE~\cite{nixon2019}, and the calibration slope
+and intercept of a logistic recalibration model~\cite{steyerberg2010,vancalster2016,huang2020}.
+Interpretability is measured by distinct rules, mean antecedents per rule and total
+literals; for the decision tree, leaves and the sum of leaf depths. Pareto quality is
+measured by the normalised hypervolume~\cite{zitzler1999}, with objective scales
+$(0.5, 0.25, R_{\max}L_{\max})$ and reference point $(1,1,1)$. We also record
+single-threaded fit time and peak resident memory.
+Following the preregistered plan, across-dataset comparisons use the Friedman
+test~\cite{friedman1937} with Nemenyi critical differences~\cite{demsar2006}
+(q$_{0.05}$ = \resCDq{} for $k=11$), and two-sided Wilcoxon signed-rank tests of
+MO-Fuzzy against each model with Holm correction~\cite{holm1979}. With $N=6$ datasets the
+smallest attainable two-sided Wilcoxon $p$ is 0.031, so these pairwise tests cannot
+reach significance after correction. This limitation was declared in advance.
+Per-dataset comparisons use the Nadeau--Bengio corrected resampled
+$t$-test~\cite{nadeau2003} over the 25 paired folds, Holm-corrected within dataset and
+metric. Reporting follows TRIPOD~\cite{collins2015} where applicable.
+
+\subsection{Computation}
+All models ran single-threaded (BLAS, OpenMP and model thread pools set to 1) on a
+Windows 11 laptop with 16\,GB RAM, through a checkpointed runner that saves every fit
+atomically and resumes after interruption. The full study (\resNFits{} fits) took
+\resComputeHours{}\,h of fit time, and peak process memory never exceeded
+\resMaxRSS{}\,MB.

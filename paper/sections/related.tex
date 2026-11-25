@@ -1,0 +1,62 @@
+\section{Related work}
+\label{sec:related}
+
+\subsection{Genetic and multi-objective evolutionary fuzzy systems}
+Genetic fuzzy systems (GFSs) use evolutionary search to tune or learn the data base
+(membership functions) and/or the rule base of a fuzzy system~\cite{herrera2008}.
+Ishibuchi et al.\ formulated rule selection as a single- or two-objective problem,
+trading classification accuracy against the number of rules~\cite{ishibuchi1997}, and
+later analysed the interpretability--accuracy trade-off with multi-objective fuzzy
+genetics-based machine learning~\cite{ishibuchi2007}. Alcal\'a et al.\ learned rule and
+data bases concurrently with a multi-objective evolutionary algorithm~\cite{alcala2009},
+and Antonelli et al.\ added the \emph{integrity} of the fuzzy partitions as a third
+objective alongside accuracy and complexity~\cite{antonelli2011}. Surveys of
+interpretability measures~\cite{gacto2011} and of MOEFS
+applications~\cite{fazzolari2013} show that complexity-based measures (number of
+rules, number of conditions) dominate in practice, and that the accuracy objective is
+almost always a classification-error criterion. Evolutionary fuzzy systems have since
+been positioned as a route to explainable AI~\cite{fernandez2019}. The NSGA-II
+algorithm~\cite{deb2002}, with fast non-dominated sorting and crowding distance, and the
+hypervolume indicator~\cite{zitzler1999} are standard tools in this line of work.
+
+\subsection{Fuzzy and genetic-fuzzy models in medicine}
+Pe\~na-Reyes and Sipper evolved compact fuzzy rule bases for breast-cancer
+diagnosis~\cite{penareyes1999}. Nauck and Kruse obtained interpretable fuzzy
+classification rules from medical data with neuro-fuzzy learning~\cite{nauck1999}.
+Hybrid neuro-fuzzy and fuzzy systems have been applied to diabetes and heart
+disease~\cite{kahramanli2008,anooj2012}, and hybrid intelligent systems combining fuzzy
+min--max networks with decision trees and random forests to several medical
+benchmarks~\cite{seera2014}. Gorza{\l}czany and Rudzi\'nski proposed a multi-objective
+genetic-fuzzy approach for interpretable and accurate medical data
+classification~\cite{gorzalczany2017}, and Pota et al.\ discussed design principles for
+rule-based fuzzy classifiers in medicine~\cite{pota2017}. ANFIS~\cite{jang1993}
+popularised \emph{hybrid learning}, in which antecedent and consequent parameters are
+estimated by different procedures. We use the same idea, combining evolutionary
+search over antecedents with convex estimation of consequents. In all of these works
+the probabilistic output, when there is one, is not optimised or assessed for calibration.
+
+\subsection{Probability calibration}
+A forecaster is calibrated if, among cases assigned probability $p$, the event occurs
+with frequency $p$. The Brier score~\cite{brier1950} and the logarithmic score are
+strictly proper scoring rules: their expectation is uniquely minimised by the true
+probabilities, and they reward calibration and sharpness
+together~\cite{gneiting2007}. Post-hoc calibration maps scores to probabilities with
+Platt scaling or isotonic regression~\cite{zadrozny2002,niculescu2005}. Binned
+calibration errors (ECE) are widely reported~\cite{naeini2015,guo2017} but depend on
+the binning; equal-mass binning is one remedy~\cite{nixon2019}. In clinical
+prediction, the calibration intercept and slope from a logistic recalibration
+model are recommended, together with the calibration
+hierarchy~\cite{steyerberg2010,vancalster2016,vancalster2019,huang2020}.
+
+\subsection{Benchmarking on tabular clinical data}
+Tree-based ensembles still outperform deep tabular models on medium-sized
+data~\cite{grinsztajn2022,shwartzziv2022}. The main implementations are
+XGBoost~\cite{chen2016}, LightGBM~\cite{ke2017} and CatBoost~\cite{prokhorenkova2018}. In
+clinical prediction a systematic review found no performance benefit of machine
+learning over logistic regression~\cite{christodoulou2019}, so a well-tuned logistic
+model is an essential baseline. Fair comparisons require nested model selection to
+avoid optimistic bias~\cite{cawley2010}, strict separation of fitted preprocessing from
+test data~\cite{kaufman2012}, and appropriate statistics across
+datasets~\cite{demsar2006} and across resampled folds~\cite{nadeau2003}. PR curves add
+information on imbalanced data~\cite{saito2015}, and reporting should follow
+TRIPOD~\cite{collins2015}.

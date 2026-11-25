@@ -1,0 +1,114 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Universe of discourse}
+All preprocessing is fitted on the training rows only (Section~\ref{sec:protocol}).
+Missing numeric values are imputed with the training median and binary/nominal values
+with the training mode. Nominal variables are one-hot encoded. Each numeric
+variable $x_j$ is mapped to $[0,1]$ by the training-fold 1st and 99th percentiles,
+$\tilde x_j = \min\{1,\max\{0,(x_j-q^{(1)}_j)/(q^{(99)}_j-q^{(1)}_j)\}\}$, which gives a
+common, outlier-robust universe for the linguistic partitions. Column types come from
+the declared schema of each dataset, never from observed values.
+
+\subsection{Linguistic partitions}
+Each continuous input has three triangular fuzzy sets $\{\text{Low},\text{Medium},\text{High}\}$
+with centres $c_1<c_2<c_3$ that form a \emph{strong} (Ruspini) partition with shoulders:
+\begin{equation}
+\mu_L(x)=\Big[\tfrac{c_2-x}{c_2-c_1}\Big]_0^1,\quad
+\mu_H(x)=\Big[\tfrac{x-c_2}{c_3-c_2}\Big]_0^1,\quad
+\mu_M(x)=1-\mu_L(x)-\mu_H(x),
+\label{eq:partition}
+\end{equation}
+where $[\cdot]_0^1$ clips to $[0,1]$. The memberships sum to one everywhere, so coverage
+and distinguishability hold by construction. A minimum gap $c_{k+1}-c_k\geq0.05$ is
+enforced by a deterministic repair, which keeps the partitions intact during
+search~\cite{antonelli2011,gacto2011}. Binary and one-hot inputs use crisp sets
+$\mu_{\text{No}}(x)=1-x$, $\mu_{\text{Yes}}(x)=x$.
+
+\subsection{Additive Takagi--Sugeno risk score}
+A rule $r$ has the form
+\[
+R_r:\ \text{IF } x_{j_1} \text{ is } A_{r,j_1} \text{ AND } \dots \text{ AND } x_{j_{L_r}} \text{ is } A_{r,j_{L_r}}
+\text{ THEN } w_r,
+\]
+with $1\le L_r\le L_{\max}$. Its firing strength uses the product t-norm,
+$\beta_r(x)=\prod_{j\in S_r}\mu_{j,A_{r,j}}(x_j)$. The zero-order Takagi--Sugeno
+output~\cite{takagi1985} is aggregated \emph{additively} on the log-odds scale:
+\begin{equation}
+\mathrm{logit}\,\hat p(x) = w_0 + \sum_{r=1}^{R} w_r\,\beta_r(x),\qquad \hat p(x)=\sigma\!\Big(w_0+\sum_r w_r\beta_r(x)\Big).
+\label{eq:score}
+\end{equation}
+A fully fired rule adds $w_r$ log-odds to the baseline $w_0$, and a partly fired rule
+adds a proportional share. The model is a graded, rule-based analogue of point-based
+clinical scores~\cite{ustun2016}: a clinician can trace any prediction to the few rules
+that fired and to their weights.
+
+\subsection{Hybrid consequent estimation with inner penalty selection}
+Given the antecedents and partitions, \eqref{eq:score} is linear in $(w_0,\mathbf w)$
+with features $B_{ir}=\beta_r(x_i)$. The consequents are therefore estimated by
+L2-penalised logistic regression,
+\begin{equation}
+\min_{w_0,\mathbf w}\ \sum_i \ell_{\log}\big(y_i,\sigma(w_0+\mathbf B_i\mathbf w)\big)+\tfrac{\lambda}{2}\|\mathbf w\|_2^2,
+\label{eq:consequents}
+\end{equation}
+solved by Newton--Raphson with an unpenalised intercept. Evolution searches the
+discrete structure and the partitions, while a convex solver fits the
+consequents, in the spirit of hybrid learning in ANFIS~\cite{jang1993}. Because
+\eqref{eq:consequents} minimises log-loss, a proper scoring rule~\cite{gneiting2007}, the
+fitted weights are calibrated for the given rule base. The penalty is chosen
+\emph{per genome} from $\lambda\in\{0.01,0.1,1,10\}$ by minimum pooled inner
+cross-validated log-loss, along a warm-started regularisation path. The
+deployed model is refitted on all training rows with the $\lambda$ selected for its
+genome.
+
+\subsection{Encoding}
+A Pittsburgh-style real-coded chromosome with integer genes holds
+(i)~three centre genes in $[0,1]$ per continuous input, sorted and repaired into
+\eqref{eq:partition};
+(ii)~$R_{\max}\times d$ antecedent genes $a_{rj}\in\{0,\dots,K_j\}$ ($0=$ ``don't care'');
+and (iii)~$R_{\max}$ activity bits. A rule is active if its bit is set and it has at
+least one condition. Duplicate antecedent sets are removed on decoding, so the
+reported rule count is the number of \emph{distinct} active rules. We use $R_{\max}=12$
+and $L_{\max}=4$. The single-objective baseline that reproduces classic GA-fuzzy
+practice also evolves the consequents $w_r\in[-4,4]$ directly.
+
+\subsection{Objectives}
+For a genome, inner stratified 3-fold cross-validation \emph{within the outer training
+fold} yields pooled out-of-fold probabilities $\hat p^{\text{oof}}$ (consequents
+fitted on two inner folds and predicted on the third). NSGA-II minimises
+\begin{equation}
+f_1 = 1-\mathrm{AUROC}(y,\hat p^{\text{oof}}),\qquad
+f_2 = \mathrm{Brier}(y,\hat p^{\text{oof}}),\qquad
+f_3 = \sum_{r\in\text{active}} |S_r| ,
+\label{eq:objectives}
+\end{equation}
+where $f_3$ is the total number of literals (antecedent conditions) in the rule base.
+Brier rather than ECE is optimised because it is a strictly proper scoring
+rule~\cite{gneiting2007}, whereas binned calibration errors depend on the binning
+scheme~\cite{nixon2019} and are estimated from few patients per bin in training folds of
+a few hundred. ECE, the calibration slope and the calibration
+intercept are reported as outcomes and are not optimised. The integer-valued $f_3$ was
+adopted after the development pilot, in which a continuous complexity measure left
+every individual non-dominated (front saturation).
+
+\subsection{Search: NSGA-II with an external archive}
+The search uses NSGA-II~\cite{deb2002} (pymoo~\cite{blank2020}) with a population of 80,
+80 generations and duplicate elimination, and custom operators that respect the
+encoding. Initialisation places the centres at training quantiles (0.2, 0.5, 0.8) with
+Gaussian jitter and draws rules with 1--3 conditions, with an activity probability
+sampled per individual to spread the initial complexity. Crossover applies BLX-$\alpha$
+($\alpha=0.3$) to the centre genes and exchanges whole rule slots uniformly.
+Mutation jitters the centres and applies one or two structural edits (add, drop or
+relabel a condition, toggle a rule, insert a new rule) with length repair. All
+non-dominated solutions seen in any generation are kept in an \emph{external archive},
+deduplicated on objective vectors, which is returned as the Pareto front.
+
+\subsection{Choosing a deployable operating point}
+The headline model is chosen by a preregistered $\varepsilon$-compact rule: among
+archive members whose inner AUROC is within $\varepsilon=0.01$ of the archive's best,
+take the one with the fewest literals, breaking ties by the lower inner Brier score.
+This is a parsimony rule in the spirit of the one-standard-error heuristic. As a
+preregistered ablation we also report the archive member with the lowest inner Brier
+score (\emph{best-Brier}), from the same run. Outer test data are never used for
+this choice. The whole archive is scored on the test fold only for the Pareto analysis
+in Section~\ref{sec:pareto}.

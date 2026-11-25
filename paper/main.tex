@@ -1,16 +1,22 @@
-%% Applied Soft Computing (Elsevier) -- elsarticle template
+%% Applied Soft Computing (Elsevier) -- elsarticle
 %% Build:  pdflatex main && bibtex main && pdflatex main && pdflatex main
-%% (or)    latexmk -pdf main.tex
+%% All numbers come from generated/macros.tex and tables/*.tex (scripts/analyze.py).
+%% For double-spaced review format use: \documentclass[review,12pt]{elsarticle}
 \documentclass[preprint,12pt]{elsarticle}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage{amsmath,amssymb,amsthm}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{array}
 \usepackage[hidelinks]{hyperref}
+\usepackage{lineno}
+
+\input{generated/macros}
+\graphicspath{{figures/}}
 
 \journal{Applied Soft Computing}
 
@@ -18,32 +24,94 @@
 
 \begin{frontmatter}
 
-\title{Pareto-Optimal Calibrated and Interpretable Fuzzy Risk Scoring via Multi-Objective Evolutionary Optimization}
+\title{Pareto-optimal calibrated and interpretable fuzzy risk scoring via multi-objective evolutionary optimisation}
 
-%% Author metadata intentionally left as placeholders until submission.
-\author[inst1]{Author One}
-\affiliation[inst1]{organization={Affiliation placeholder},
+%% Author and affiliation details to be completed by the authors before submission.
+\author[inst1]{Author Name\corref{cor1}}
+\ead{author@example.org}
+\cortext[cor1]{Corresponding author.}
+\affiliation[inst1]{organization={Affiliation},
+            city={City},
             country={Country}}
 
 \begin{abstract}
-%% Placeholder -- written after the preregistered held-out evaluation (Phase 5).
-Template build check. No results are reported in this draft.
+Clinical risk scores must discriminate, be calibrated and be interpretable, yet
+genetic-fuzzy models for health risk are optimised for accuracy alone and rarely
+compared with tuned gradient-boosted trees. We propose a zero-order Takagi--Sugeno
+additive fuzzy risk score whose linguistic partitions and rules are evolved by NSGA-II
+for three objectives: $1-$AUROC, the Brier score (a strictly proper scoring rule) and
+the total number of rule literals. Rule weights are fitted by penalised logistic
+regression with an inner-validated penalty. In a preregistered, leakage-free study
+(\resNSeeds{}$\times$5-fold cross-validation, \resNFits{} model fits, code hashes locked
+before four held-out datasets were unlocked) on six public clinical datasets against
+eleven models, the proposed score used on average \resMOLiteralsAll{} literals, against
+\resHybridLiteralsAll{} for a single-objective genetic-fuzzy model. Its mean AUROC was
+\resMOAurocAll{} and its mean Brier score \resMOBrierAll{}. Preregistered hypotheses:
+calibration advantage over accuracy-driven genetic-fuzzy models (H1) \resHOne{};
+AUROC within 0.02 of the best gradient-boosted tree on \resHTwoN{}/6 datasets (H2)
+\resHTwo{}; calibration-slope advantage (H3) \resHThree{}; at most half the literals of a
+single-objective genetic-fuzzy model without material AUROC loss (H4) \resHFour{}.
+Optimising a proper scoring rule alongside complexity yields compact rule-based risk
+scores whose calibration is comparable to that of tuned black-box models.
 \end{abstract}
 
+\begin{graphicalabstract}
+%% Graphical abstract to be supplied as a separate file at submission
+%% (suggested: Fig.~\ref{fig:pareto} Pareto panel + Table~\ref{tab:rules_heart_cleveland} rule base).
+\centering
+\includegraphics[width=0.95\linewidth]{pareto_fronts}
+\end{graphicalabstract}
+
+\begin{highlights}
+\input{generated/highlights}
+\end{highlights}
+
 \begin{keyword}
-Genetic fuzzy systems \sep NSGA-II \sep Probability calibration \sep Interpretability \sep Clinical risk prediction \sep Gradient boosting
+Genetic fuzzy systems \sep NSGA-II \sep Probability calibration \sep Brier score \sep
+Interpretable machine learning \sep Clinical risk prediction
 \end{keyword}
 
 \end{frontmatter}
 
-\section{Introduction}
-\label{sec:intro}
-%% Placeholder text exercising the bibliography pipeline only.
-Takagi--Sugeno fuzzy models~\cite{takagi1985} optimised with genetic
-algorithms~\cite{herrera2008} and multi-objective evolutionary
-algorithms such as NSGA-II~\cite{deb2002} trade accuracy for
-interpretability~\cite{ishibuchi2007,fazzolari2013}. Calibration of clinical
-risk models is a separate requirement~\cite{vancalster2019}.
+\linenumbers
+
+\input{sections/introduction}
+\input{sections/related}
+\input{sections/method}
+\input{sections/protocol}
+\input{sections/results}
+\input{sections/rules}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+\section*{CRediT authorship contribution statement}
+\textbf{Author Name:} Conceptualization, Methodology, Software, Validation, Formal analysis,
+Investigation, Data curation, Writing -- original draft, Writing -- review \& editing,
+Visualization. \emph{(To be completed by the authors.)}
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal
+relationships that could have appeared to influence the work reported in this paper.
+\emph{(To be confirmed by the authors.)}
+
+\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
+During the preparation of this work the authors used an AI coding and writing assistant
+(Claude, Anthropic) to implement the software, run the experiments and draft the
+manuscript. After using this tool, the authors reviewed and edited the content as needed
+and take full responsibility for the content of the publication.
+
+\section*{Data availability}
+All datasets are public (OpenML and the UCI Machine Learning Repository). The loaders
+download them on demand and verify the published md5 and pinned sha256 checksums.
+
+\section*{Code availability and reproducibility}
+The implementation, unit tests, preregistration (with SHA-256 hashes of the locked
+code), deviation log, raw per-fold results, analysis scripts and an automated audit
+that regenerates every table and in-text number from the stored results are available
+in the project repository (link to be added at submission).
+
+\section*{Funding}
+\emph{(To be completed by the authors.)}
 
 \bibliographystyle{elsarticle-num}
 \bibliography{references}

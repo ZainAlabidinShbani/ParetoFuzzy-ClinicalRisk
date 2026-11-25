@@ -1,0 +1,63 @@
+\section{Introduction}
+\label{sec:intro}
+
+Clinical risk scores are used to decide whom to test, treat or monitor, so the
+probabilities they output must be meaningful in their own right. A model that ranks
+patients well but reports a 40\% risk for a group whose observed event rate is 15\%
+can mislead decisions as badly as a model with poor discrimination. Calibration has
+therefore been called the ``Achilles heel'' of predictive analytics~\cite{vancalster2019},
+and modern reporting and evaluation frameworks ask for discrimination and calibration
+together~\cite{steyerberg2010,collins2015,vancalster2016,huang2020}. In high-stakes
+settings it is also argued that models should be \emph{inherently} interpretable rather
+than explained after the fact~\cite{rudin2019}, which is why point-based scoring
+systems remain popular in medicine~\cite{ustun2016}.
+
+Fuzzy rule-based systems~\cite{zadeh1965,mamdani1975,takagi1985} are a natural
+candidate for such scores: linguistic rules such as ``IF glucose is High AND BMI is
+High'' are readable by clinicians, and genetic algorithms can learn both the rules and
+the membership functions from data~\cite{herrera2008,fernandez2019}. Genetic-fuzzy and
+neuro-fuzzy classifiers have a long history in medical
+applications~\cite{penareyes1999,nauck1999,kahramanli2008,anooj2012,seera2014,pota2017}.
+Multi-objective evolutionary fuzzy systems (MOEFSs) made the trade-off between
+accuracy and rule-base complexity explicit, returning a Pareto front of models instead
+of a single one~\cite{ishibuchi1997,ishibuchi2007,alcala2009,antonelli2011,fazzolari2013,gorzalczany2017}.
+
+Three gaps remain. First, the objectives optimised by genetic-fuzzy medical models are,
+almost without exception, accuracy-type criteria (classification rate, error, $F_1$),
+sometimes paired with complexity~\cite{fazzolari2013,gacto2011}. None of them is a
+proper scoring rule~\cite{gneiting2007}, so nothing in the search rewards
+well-calibrated probabilities. Second, the resulting systems are rarely compared with
+tuned gradient-boosted decision trees (GBDTs), which remain the strongest general
+learners on medium-sized tabular data~\cite{grinsztajn2022,shwartzziv2022}, or with
+logistic regression, which in clinical prediction is often as good as more flexible
+learners~\cite{christodoulou2019}. Third, comparisons are seldom protected against
+model-selection bias and leakage~\cite{cawley2010,kaufman2012}, and design decisions
+are often taken on the same data used to report results.
+
+This paper addresses these gaps with a fuzzy risk score that is optimised by NSGA-II~\cite{deb2002}
+for three objectives at once: discrimination ($1-$AUROC), calibration (Brier
+score~\cite{brier1950}, a strictly proper scoring rule) and interpretability (total
+number of rule literals). The contributions are:
+\begin{enumerate}
+\item A zero-order Takagi--Sugeno \emph{additive fuzzy risk score}: baseline log-odds
+plus rule contributions weighted by fuzzy firing strengths. It reads like a point-based
+clinical score but uses graded linguistic conditions. Rule weights are estimated by
+penalised logistic regression inside the evolutionary loop (hybrid learning), with the
+penalty selected per candidate by inner cross-validated log-loss.
+\item A three-objective NSGA-II formulation with an external non-dominated archive, an
+integer interpretability objective, and a preregistered rule for choosing one
+deployable model from the front.
+\item A preregistered, leakage-free benchmark on six public clinical datasets. Two
+development datasets were used for all design decisions. The protocol, hypotheses and
+SHA-256 hashes of the code were locked before four held-out datasets were downloaded.
+The benchmark covers 11 models, including tuned XGBoost, LightGBM and CatBoost, post-hoc
+Platt and isotonic calibration, and single-objective genetic-fuzzy baselines.
+\item An open, tested implementation (\resNFits{} model fits, single-threaded on a
+laptop), whose tables and in-text numbers are regenerated automatically from the
+stored results.
+\end{enumerate}
+
+Section~\ref{sec:related} reviews related work, Section~\ref{sec:method} describes the
+model and the optimiser, Section~\ref{sec:protocol} the preregistered protocol,
+Section~\ref{sec:results} the results, Section~\ref{sec:rules} the extracted rule bases,
+and Section~\ref{sec:discussion} limitations and threats to validity.

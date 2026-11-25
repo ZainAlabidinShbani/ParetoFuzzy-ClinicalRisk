@@ -1,0 +1,45 @@
+\section{Discussion, limitations and threats to validity}
+\label{sec:discussion}
+
+%% <<DISCUSSION_RESULTS>>
+
+\paragraph{Statistical power}
+Six datasets give little power to across-dataset tests: the smallest attainable
+two-sided exact Wilcoxon $p$ is 0.031, and Nemenyi critical differences at $k=11$, $N=6$
+are large (Table~\ref{tab:ranks}). We declared this in the preregistration and base
+conclusions on effect sizes, per-dataset corrected resampled tests and preregistered
+count criteria rather than on across-dataset significance. Even corrected
+resampled $t$-tests are approximate, because the 25 folds share training
+data~\cite{nadeau2003}.
+
+\paragraph{Datasets}
+The benchmarks are public, old, small to medium-sized and convenience-sampled. WDBC and
+CKD are near-separable, which compresses discrimination differences (declared in
+advance). The thyroid data are imbalanced (6\% positives), so binned ECE is dominated
+by the lowest-risk bins. No conclusion about clinical transportability, external
+validity or decision utility should be drawn; that requires external validation
+cohorts and decision-analytic evaluation~\cite{steyerberg2010,collins2015}.
+
+\paragraph{Design choices}
+The development pilot motivated three refinements: an integer literal count, an
+external archive, and inner selection of $\lambda$. All of these were fixed before
+the held-out data were unlocked. Other choices were not tuned: three fuzzy sets per
+variable, $R_{\max}=12$, $L_{\max}=4$, the 80$\times$80 evolutionary budget, and the
+$\varepsilon=0.01$ selection rule. The genetic-fuzzy models received the same
+evaluation budget as one another but not the same compute as the baselines.
+Baselines were tuned with a 20-iteration random search, which may under-tune the
+GBDTs relative to larger budgets. Percentile scaling to $[0,1]$ depends on the training
+fold, so membership centres are reported in original units for each deployed model.
+
+\paragraph{Interpretability}
+Literal counts are a syntactic proxy for interpretability~\cite{gacto2011}. The rule
+bases in Section~\ref{sec:rules} are offered as illustrations, not as clinically
+validated knowledge. Additive rule contributions can overlap when several rules fire
+together, and weights of correlated rules should not be read causally.
+
+\paragraph{Software}
+All code, unit tests (leakage, valid probabilities, determinism, Pareto validity,
+rule extraction, data integrity), raw per-fold results and the analysis scripts are
+released. An automated audit (Section~\ref{sec:protocol}) checks the preregistration
+hashes and the provenance of every fit, and regenerates every table and in-text
+number from the stored results.
