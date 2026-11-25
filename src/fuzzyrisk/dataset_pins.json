@@ -1,4 +1,8 @@
 {
+  "breast_wdbc": "63ec475a3f5161c10bd8127d314637dce134bc5893560a9d5fff5de74353cf79",
   "heart_cleveland": "8148e64304223f8ec9adf98dba07419772ffc87188c3ca242f70d7a3e3ccd451",
-  "pima_diabetes": "c1b530cb22b468b5bc6da61d1467eec08882409d8edf89b0c7ae7bf6596b86f2"
+  "kidney_ckd": "b910a3bf619d3f25424a5fdf9ba9bc9411db9380e8a883faf92ce8d0f819c77f",
+  "liver_ilpd": "2115bfaf47d1b1de7129a414ff2b00ea1ce74d998f864a63feaa3cd2979bc50c",
+  "pima_diabetes": "c1b530cb22b468b5bc6da61d1467eec08882409d8edf89b0c7ae7bf6596b86f2",
+  "thyroid_sick": "8cc90b5f5d134f584fe64181ed31b0889a6a179445ae6ea80c0d3c15e44b3a9a"
 }

@@ -167,8 +167,15 @@ def _fetch_raw(name: str, spec: dict) -> pd.DataFrame:
         from sklearn.datasets import fetch_openml
 
         DATA_CACHE.mkdir(parents=True, exist_ok=True)
-        bunch = fetch_openml(data_id=spec["openml_id"], as_frame=True, data_home=str(DATA_CACHE),
-                             parser="pandas")
+        try:
+            bunch = fetch_openml(data_id=spec["openml_id"], as_frame=True, data_home=str(DATA_CACHE),
+                                 parser="pandas")
+        except TypeError:
+            # Deviation D1 (PROGRESS.md): sklearn 1.9's pandas ARFF parser fails under pandas 3
+            # on integer-like nominal levels (e.g. WDBC Class {1,2}); parse the same
+            # md5-verified file with sklearn's LIAC-ARFF parser instead.
+            bunch = fetch_openml(data_id=spec["openml_id"], as_frame=True, data_home=str(DATA_CACHE),
+                                 parser="liac-arff")
         frame = bunch.frame.copy()
         # (1) the md5 OpenML serves in the description must equal the registered md5
         served = bunch.details.get("md5_checksum")

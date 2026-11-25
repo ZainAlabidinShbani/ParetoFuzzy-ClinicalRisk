@@ -138,7 +138,32 @@ within noise.
    session's fits (column `n_fits`); per-fold peaks above come from
    `records.csv`.
 
-## Next
 
 Review the pilot, then Phase 3 (decide items 1–3, write and lock
 `PREREGISTRATION.md`, unlock the held-out datasets).
+## 2026-11-25 — Pre-Phase-3 refinements (commits `d234092`, `4d08947`)
+
+* f3 = total literals (integer). NSGA-II population 80 × 80 generations
+  with an external non-dominated archive (archives of 9–34 solutions in a
+  one-fold benchmark, vs a saturated 60/60 front in the pilot).
+* λ selected per genome from {0.01, 0.1, 1, 10} by inner-OOF log-loss.
+* ε = 0.01 compact rule kept as the headline; best-Brier archive member
+  logged as the `MO-Fuzzy(best-Brier)` ablation.
+* Registered n/positive counts per dataset, explicit CKD schema,
+  `scripts/run_experiment.py`. 64 tests pass.
+
+## 2026-11-25 — Phase 3: preregistration locked (commit `b1a6d27`, tag `prereg-v1`)
+
+* `PREREGISTRATION.md` (`status: locked`): datasets, positive classes
+  confirmed from official documentation, frozen configuration, H1–H4,
+  analysis plan with the N = 6 power caveat, and SHA-256 of 22 locked files.
+* Held-out unlock: all four datasets pass md5 (OpenML) and n/positive checks
+  (WDBC 569/212, ILPD 583/416, Thyroid 3772/231, CKD 400/250). sha256 pins
+  were added to `dataset_pins.json` at first fetch.
+
+### Deviations from preregistration
+
+Machine-readable copy: `PREREGISTRATION_DEVIATIONS.json`; verified by `tools/audit.py`.
+
+* **D1** (`src/fuzzyrisk/data.py`, new sha256 `9316f24902656f47…`): At unlock, sklearn 1.9's pandas ARFF parser raised TypeError under pandas 3 on integer-like nominal levels (WDBC Class {1,2}). Added a fallback to sklearn's LIAC-ARFF parser for the same md5-verified file. Parsing only; no change to method, data, splits or metrics. Dev datasets still parse with the pandas parser and match their pinned sha256.
+* **D2** (`tests/test_metrics_data.py`, new sha256 `a7343a97c02b494e…`): test_heldout_not_present_on_disk encodes a pre-unlock invariant that becomes false by design once held-out data are fetched; it now skips when PREREGISTRATION.md is locked.

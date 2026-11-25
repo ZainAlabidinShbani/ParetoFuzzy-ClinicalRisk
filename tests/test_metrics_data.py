@@ -68,6 +68,10 @@ def test_heldout_locked(name, monkeypatch, tmp_path):
 
 
 def test_heldout_not_present_on_disk():
+    # Deviation D2 (PROGRESS.md): pre-unlock invariant; after the locked preregistration
+    # the held-out files are fetched by design.
+    if D.preregistration_locked():
+        pytest.skip("held-out datasets unlocked by the locked preregistration")
     for name in D.heldout_datasets():
         assert not (D.DATA_RAW / f"{name}.csv").exists()
 

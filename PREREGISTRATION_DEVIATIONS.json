@@ -1,0 +1,16 @@
+[
+  {
+    "id": "D1",
+    "date": "2026-11-25",
+    "file": "src/fuzzyrisk/data.py",
+    "new_sha256": "9316f24902656f47751504742e89ef7ddbdf5a72c7e409ec8a6dbf8c0e8f34ce",
+    "reason": "At unlock, sklearn 1.9's pandas ARFF parser raised TypeError under pandas 3 on integer-like nominal levels (WDBC Class {1,2}). Added a fallback to sklearn's LIAC-ARFF parser for the same md5-verified file. Parsing only; no change to method, data, splits or metrics. Dev datasets still parse with the pandas parser and match their pinned sha256."
+  },
+  {
+    "id": "D2",
+    "date": "2026-11-25",
+    "file": "tests/test_metrics_data.py",
+    "new_sha256": "a7343a97c02b494eb343275a228ef054b8984c91782fc468bcd9489a9b2829d8",
+    "reason": "test_heldout_not_present_on_disk encodes a pre-unlock invariant that becomes false by design once held-out data are fetched; it now skips when PREREGISTRATION.md is locked."
+  }
+]
