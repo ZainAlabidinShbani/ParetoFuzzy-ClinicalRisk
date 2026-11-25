@@ -1,57 +1,426 @@
 [
-  {"key": "zadeh1965", "doi": "10.1016/S0019-9958(65)90241-X", "title": "Fuzzy sets", "author": "Zadeh", "group": "foundations", "role": "method"},
-  {"key": "mamdani1975", "doi": "10.1016/S0020-7373(75)80002-2", "title": "An experiment in linguistic synthesis with a fuzzy logic controller", "author": "Mamdani", "group": "foundations", "role": "method"},
-  {"key": "takagi1985", "doi": "10.1109/TSMC.1985.6313399", "title": "Fuzzy identification of systems and its applications to modeling and control", "author": "Takagi", "group": "foundations", "role": "method"},
-  {"key": "jang1993", "doi": "10.1109/21.256541", "title": "ANFIS: adaptive-network-based fuzzy inference system", "author": "Jang", "group": "foundations", "role": "method"},
-  {"key": "deb2002", "doi": "10.1109/4235.996017", "title": "A fast and elitist multiobjective genetic algorithm: NSGA-II", "author": "Deb", "group": "foundations", "role": "method"},
-  {"key": "zitzler1999", "doi": "10.1109/4235.797969", "title": "Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach", "author": "Zitzler", "group": "foundations", "role": "method"},
-  {"key": "blank2020", "doi": "10.1109/ACCESS.2020.2990567", "title": "Pymoo: Multi-Objective Optimization in Python", "author": "Blank", "group": "software", "role": "software"},
-
-  {"key": "ishibuchi1997", "doi": "10.1016/S0165-0114(96)00098-X", "title": "Single-objective and two-objective genetic algorithms for selecting linguistic rules for pattern classification problems", "author": "Ishibuchi", "group": "gfs_moefs", "role": "core"},
-  {"key": "ishibuchi2007", "doi": "10.1016/j.ijar.2006.01.004", "title": "Analysis of interpretability-accuracy tradeoff of fuzzy systems by multiobjective fuzzy genetics-based machine learning", "author": "Ishibuchi", "group": "gfs_moefs", "role": "core"},
-  {"key": "herrera2008", "doi": "10.1007/s12065-007-0001-5", "title": "Genetic fuzzy systems: taxonomy, current research trends and prospects", "author": "Herrera", "group": "gfs_moefs", "role": "core"},
-  {"key": "alcala2009", "doi": "10.1109/TFUZZ.2009.2023113", "title": "A multiobjective evolutionary approach to concurrently learn rule and data bases of linguistic fuzzy-rule-based systems", "author": "Alcala", "group": "gfs_moefs", "role": "core"},
-  {"key": "gacto2011", "doi": "10.1016/j.ins.2011.02.021", "title": "Interpretability of linguistic fuzzy rule-based systems: An overview of interpretability measures", "author": "Gacto", "group": "gfs_moefs", "role": "core"},
-  {"key": "antonelli2011", "doi": "10.1007/s00500-010-0665-0", "title": "Learning knowledge bases of multi-objective evolutionary fuzzy systems by simultaneously optimizing accuracy, complexity and partition integrity", "author": "Antonelli", "group": "gfs_moefs", "role": "core"},
-  {"key": "fazzolari2013", "doi": "10.1109/TFUZZ.2012.2201338", "title": "A review of the application of multiobjective evolutionary fuzzy systems: current status and further directions", "author": "Fazzolari", "group": "gfs_moefs", "role": "core"},
-  {"key": "fernandez2019", "doi": "10.1109/MCI.2018.2881645", "title": "Evolutionary fuzzy systems for explainable artificial intelligence: why, when, what for, and where to?", "author": "Fernandez", "group": "gfs_moefs", "role": "core"},
-
-  {"key": "penareyes1999", "doi": "10.1016/S0933-3657(99)00019-6", "title": "A fuzzy-genetic approach to breast cancer diagnosis", "author": "Pena-Reyes", "group": "medical_fuzzy", "role": "core"},
-  {"key": "nauck1999", "doi": "10.1016/S0933-3657(98)00070-0", "title": "Obtaining interpretable fuzzy classification rules from medical data", "author": "Nauck", "group": "medical_fuzzy", "role": "core"},
-  {"key": "kahramanli2008", "doi": "10.1016/j.eswa.2007.06.004", "title": "Design of a hybrid system for the diabetes and heart diseases", "author": "Kahramanli", "group": "medical_fuzzy", "role": "core"},
-  {"key": "anooj2012", "doi": "10.1016/j.jksuci.2011.09.002", "title": "Clinical decision support system: Risk level prediction of heart disease using weighted fuzzy rules", "author": "Anooj", "group": "medical_fuzzy", "role": "core"},
-  {"key": "seera2014", "doi": "10.1016/j.eswa.2013.09.022", "title": "A hybrid intelligent system for medical data classification", "author": "Seera", "group": "medical_fuzzy", "role": "core"},
-  {"key": "gorzalczany2017", "doi": "10.1016/j.eswa.2016.11.017", "title": "Interpretable and accurate medical data classification - a multi-objective genetic-fuzzy optimization approach", "author": "Gorzalczany", "group": "medical_fuzzy", "role": "core"},
-  {"key": "pota2017", "doi": "10.1016/j.knosys.2017.03.006", "title": "Designing rule-based fuzzy systems for classification in medicine", "author": "Pota", "group": "medical_fuzzy", "role": "core"},
-
-  {"key": "brier1950", "doi": "10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2", "title": "Verification of forecasts expressed in terms of probability", "author": "Brier", "group": "calibration", "role": "core"},
-  {"key": "zadrozny2002", "doi": "10.1145/775047.775151", "title": "Transforming classifier scores into accurate multiclass probability estimates", "author": "Zadrozny", "group": "calibration", "role": "core"},
-  {"key": "niculescu2005", "doi": "10.1145/1102351.1102430", "title": "Predicting good probabilities with supervised learning", "author": "Niculescu-Mizil", "group": "calibration", "role": "core"},
-  {"key": "gneiting2007", "doi": "10.1198/016214506000001437", "title": "Strictly proper scoring rules, prediction, and estimation", "author": "Gneiting", "group": "calibration", "role": "core"},
-  {"key": "naeini2015", "doi": "10.1609/aaai.v29i1.9602", "title": "Obtaining well calibrated probabilities using Bayesian binning", "author": "Naeini", "group": "calibration", "role": "core"},
-  {"key": "guo2017", "arxiv": "1706.04599", "title": "On calibration of modern neural networks", "author": "Guo", "group": "calibration", "role": "core"},
-  {"key": "nixon2019", "arxiv": "1904.01685", "title": "Measuring calibration in deep learning", "author": "Nixon", "group": "calibration", "role": "core"},
-  {"key": "steyerberg2010", "doi": "10.1097/EDE.0b013e3181c30fb2", "title": "Assessing the performance of prediction models: a framework for traditional and novel measures", "author": "Steyerberg", "group": "clinical_prediction", "role": "core"},
-  {"key": "vancalster2016", "doi": "10.1016/j.jclinepi.2015.12.005", "title": "A calibration hierarchy for risk models was defined: from utopia to empirical data", "author": "Van Calster", "group": "clinical_prediction", "role": "core"},
-  {"key": "vancalster2019", "doi": "10.1186/s12916-019-1466-7", "title": "Calibration: the Achilles heel of predictive analytics", "author": "Van Calster", "group": "clinical_prediction", "role": "core"},
-  {"key": "huang2020", "doi": "10.1093/jamia/ocz228", "title": "A tutorial on calibration measurements and calibration models for clinical prediction models", "author": "Huang", "group": "clinical_prediction", "role": "core"},
-  {"key": "collins2015", "doi": "10.1136/bmj.g7594", "title": "Transparent reporting of a multivariable prediction model for individual prognosis or diagnosis (TRIPOD): the TRIPOD statement", "author": "Collins", "group": "clinical_prediction", "role": "core"},
-  {"key": "christodoulou2019", "doi": "10.1016/j.jclinepi.2019.02.004", "title": "A systematic review shows no performance benefit of machine learning over logistic regression for clinical prediction models", "author": "Christodoulou", "group": "clinical_prediction", "role": "core"},
-
-  {"key": "rudin2019", "doi": "10.1038/s42256-019-0048-x", "title": "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead", "author": "Rudin", "group": "interpretable_tabular", "role": "core"},
-  {"key": "ustun2016", "doi": "10.1007/s10994-015-5528-6", "title": "Supersparse linear integer models for optimized medical scoring systems", "author": "Ustun", "group": "interpretable_tabular", "role": "core"},
-  {"key": "grinsztajn2022", "arxiv": "2207.08815", "title": "Why do tree-based models still outperform deep learning on tabular data?", "author": "Grinsztajn", "group": "interpretable_tabular", "role": "core"},
-  {"key": "shwartzziv2022", "doi": "10.1016/j.inffus.2021.11.011", "title": "Tabular data: Deep learning is not all you need", "author": "Shwartz-Ziv", "group": "interpretable_tabular", "role": "core"},
-  {"key": "chen2016", "doi": "10.1145/2939672.2939785", "title": "XGBoost: A scalable tree boosting system", "author": "Chen", "group": "software", "role": "software"},
-  {"key": "ke2017", "s2_title": "LightGBM: A Highly Efficient Gradient Boosting Decision Tree", "title": "LightGBM: A highly efficient gradient boosting decision tree", "author": "Ke", "group": "software", "role": "software"},
-  {"key": "prokhorenkova2018", "arxiv": "1706.09516", "title": "CatBoost: unbiased boosting with categorical features", "author": "Prokhorenkova", "group": "software", "role": "software"},
-  {"key": "pedregosa2011", "arxiv": "1201.0490", "title": "Scikit-learn: Machine learning in Python", "author": "Pedregosa", "group": "software", "role": "software"},
-
-  {"key": "demsar2006", "s2_title": "Statistical Comparisons of Classifiers over Multiple Data Sets", "title": "Statistical comparisons of classifiers over multiple data sets", "author": "Demsar", "group": "evaluation", "role": "core"},
-  {"key": "benavoli2017", "arxiv": "1606.04316", "title": "Time for a change: a tutorial for comparing multiple classifiers through Bayesian analysis", "author": "Benavoli", "group": "evaluation", "role": "method"},
-  {"key": "cawley2010", "s2_title": "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation", "title": "On over-fitting in model selection and subsequent selection bias in performance evaluation", "author": "Cawley", "group": "evaluation", "role": "core"},
-  {"key": "kaufman2012", "doi": "10.1145/2382577.2382579", "title": "Leakage in data mining: Formulation, detection, and avoidance", "author": "Kaufman", "group": "evaluation", "role": "core"},
-  {"key": "saito2015", "doi": "10.1371/journal.pone.0118432", "title": "The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets", "author": "Saito", "group": "evaluation", "role": "method"},
-  {"key": "vanschoren2014", "doi": "10.1145/2641190.2641198", "title": "OpenML: networked science in machine learning", "author": "Vanschoren", "group": "data", "role": "data"},
-  {"key": "detrano1989", "doi": "10.1016/0002-9149(89)90524-9", "title": "International application of a new probability algorithm for the diagnosis of coronary artery disease", "author": "Detrano", "group": "data", "role": "data"}
+ {
+  "key": "zadeh1965",
+  "doi": "10.1016/S0019-9958(65)90241-X",
+  "title": "Fuzzy sets",
+  "author": "Zadeh",
+  "group": "foundations",
+  "role": "method"
+ },
+ {
+  "key": "mamdani1975",
+  "doi": "10.1016/S0020-7373(75)80002-2",
+  "title": "An experiment in linguistic synthesis with a fuzzy logic controller",
+  "author": "Mamdani",
+  "group": "foundations",
+  "role": "method"
+ },
+ {
+  "key": "takagi1985",
+  "doi": "10.1109/TSMC.1985.6313399",
+  "title": "Fuzzy identification of systems and its applications to modeling and control",
+  "author": "Takagi",
+  "group": "foundations",
+  "role": "method"
+ },
+ {
+  "key": "jang1993",
+  "doi": "10.1109/21.256541",
+  "title": "ANFIS: adaptive-network-based fuzzy inference system",
+  "author": "Jang",
+  "group": "foundations",
+  "role": "method"
+ },
+ {
+  "key": "deb2002",
+  "doi": "10.1109/4235.996017",
+  "title": "A fast and elitist multiobjective genetic algorithm: NSGA-II",
+  "author": "Deb",
+  "group": "foundations",
+  "role": "method"
+ },
+ {
+  "key": "zitzler1999",
+  "doi": "10.1109/4235.797969",
+  "title": "Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach",
+  "author": "Zitzler",
+  "group": "foundations",
+  "role": "method"
+ },
+ {
+  "key": "blank2020",
+  "doi": "10.1109/ACCESS.2020.2990567",
+  "title": "Pymoo: Multi-Objective Optimization in Python",
+  "author": "Blank",
+  "group": "software",
+  "role": "software"
+ },
+ {
+  "key": "ishibuchi1997",
+  "doi": "10.1016/S0165-0114(96)00098-X",
+  "title": "Single-objective and two-objective genetic algorithms for selecting linguistic rules for pattern classification problems",
+  "author": "Ishibuchi",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "ishibuchi2007",
+  "doi": "10.1016/j.ijar.2006.01.004",
+  "title": "Analysis of interpretability-accuracy tradeoff of fuzzy systems by multiobjective fuzzy genetics-based machine learning",
+  "author": "Ishibuchi",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "herrera2008",
+  "doi": "10.1007/s12065-007-0001-5",
+  "title": "Genetic fuzzy systems: taxonomy, current research trends and prospects",
+  "author": "Herrera",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "alcala2009",
+  "doi": "10.1109/TFUZZ.2009.2023113",
+  "title": "A multiobjective evolutionary approach to concurrently learn rule and data bases of linguistic fuzzy-rule-based systems",
+  "author": "Alcala",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "gacto2011",
+  "doi": "10.1016/j.ins.2011.02.021",
+  "title": "Interpretability of linguistic fuzzy rule-based systems: An overview of interpretability measures",
+  "author": "Gacto",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "antonelli2011",
+  "doi": "10.1007/s00500-010-0665-0",
+  "title": "Learning knowledge bases of multi-objective evolutionary fuzzy systems by simultaneously optimizing accuracy, complexity and partition integrity",
+  "author": "Antonelli",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "fazzolari2013",
+  "doi": "10.1109/TFUZZ.2012.2201338",
+  "title": "A review of the application of multiobjective evolutionary fuzzy systems: current status and further directions",
+  "author": "Fazzolari",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "fernandez2019",
+  "doi": "10.1109/MCI.2018.2881645",
+  "title": "Evolutionary fuzzy systems for explainable artificial intelligence: why, when, what for, and where to?",
+  "author": "Fernandez",
+  "group": "gfs_moefs",
+  "role": "core"
+ },
+ {
+  "key": "penareyes1999",
+  "doi": "10.1016/S0933-3657(99)00019-6",
+  "title": "A fuzzy-genetic approach to breast cancer diagnosis",
+  "author": "Pena-Reyes",
+  "group": "medical_fuzzy",
+  "role": "core"
+ },
+ {
+  "key": "nauck1999",
+  "doi": "10.1016/S0933-3657(98)00070-0",
+  "title": "Obtaining interpretable fuzzy classification rules from medical data",
+  "author": "Nauck",
+  "group": "medical_fuzzy",
+  "role": "core"
+ },
+ {
+  "key": "kahramanli2008",
+  "doi": "10.1016/j.eswa.2007.06.004",
+  "title": "Design of a hybrid system for the diabetes and heart diseases",
+  "author": "Kahramanli",
+  "group": "medical_fuzzy",
+  "role": "core"
+ },
+ {
+  "key": "anooj2012",
+  "doi": "10.1016/j.jksuci.2011.09.002",
+  "title": "Clinical decision support system: Risk level prediction of heart disease using weighted fuzzy rules",
+  "author": "Anooj",
+  "group": "medical_fuzzy",
+  "role": "core"
+ },
+ {
+  "key": "seera2014",
+  "doi": "10.1016/j.eswa.2013.09.022",
+  "title": "A hybrid intelligent system for medical data classification",
+  "author": "Seera",
+  "group": "medical_fuzzy",
+  "role": "core"
+ },
+ {
+  "key": "gorzalczany2017",
+  "doi": "10.1016/j.eswa.2016.11.017",
+  "title": "Interpretable and accurate medical data classification - a multi-objective genetic-fuzzy optimization approach",
+  "author": "Gorzalczany",
+  "group": "medical_fuzzy",
+  "role": "core"
+ },
+ {
+  "key": "pota2017",
+  "doi": "10.1016/j.knosys.2017.03.006",
+  "title": "Designing rule-based fuzzy systems for classification in medicine",
+  "author": "Pota",
+  "group": "medical_fuzzy",
+  "role": "core"
+ },
+ {
+  "key": "brier1950",
+  "doi": "10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2",
+  "title": "Verification of forecasts expressed in terms of probability",
+  "author": "Brier",
+  "group": "calibration",
+  "role": "core"
+ },
+ {
+  "key": "zadrozny2002",
+  "doi": "10.1145/775047.775151",
+  "title": "Transforming classifier scores into accurate multiclass probability estimates",
+  "author": "Zadrozny",
+  "group": "calibration",
+  "role": "core"
+ },
+ {
+  "key": "niculescu2005",
+  "doi": "10.1145/1102351.1102430",
+  "title": "Predicting good probabilities with supervised learning",
+  "author": "Niculescu-Mizil",
+  "group": "calibration",
+  "role": "core"
+ },
+ {
+  "key": "gneiting2007",
+  "doi": "10.1198/016214506000001437",
+  "title": "Strictly proper scoring rules, prediction, and estimation",
+  "author": "Gneiting",
+  "group": "calibration",
+  "role": "core"
+ },
+ {
+  "key": "naeini2015",
+  "doi": "10.1609/aaai.v29i1.9602",
+  "title": "Obtaining well calibrated probabilities using Bayesian binning",
+  "author": "Naeini",
+  "group": "calibration",
+  "role": "core"
+ },
+ {
+  "key": "guo2017",
+  "arxiv": "1706.04599",
+  "title": "On calibration of modern neural networks",
+  "author": "Guo",
+  "group": "calibration",
+  "role": "core"
+ },
+ {
+  "key": "nixon2019",
+  "arxiv": "1904.01685",
+  "title": "Measuring calibration in deep learning",
+  "author": "Nixon",
+  "group": "calibration",
+  "role": "core"
+ },
+ {
+  "key": "steyerberg2010",
+  "doi": "10.1097/EDE.0b013e3181c30fb2",
+  "title": "Assessing the performance of prediction models: a framework for traditional and novel measures",
+  "author": "Steyerberg",
+  "group": "clinical_prediction",
+  "role": "core"
+ },
+ {
+  "key": "vancalster2016",
+  "doi": "10.1016/j.jclinepi.2015.12.005",
+  "title": "A calibration hierarchy for risk models was defined: from utopia to empirical data",
+  "author": "Van Calster",
+  "group": "clinical_prediction",
+  "role": "core"
+ },
+ {
+  "key": "vancalster2019",
+  "doi": "10.1186/s12916-019-1466-7",
+  "title": "Calibration: the Achilles heel of predictive analytics",
+  "author": "Van Calster",
+  "group": "clinical_prediction",
+  "role": "core"
+ },
+ {
+  "key": "huang2020",
+  "doi": "10.1093/jamia/ocz228",
+  "title": "A tutorial on calibration measurements and calibration models for clinical prediction models",
+  "author": "Huang",
+  "group": "clinical_prediction",
+  "role": "core"
+ },
+ {
+  "key": "collins2015",
+  "doi": "10.1136/bmj.g7594",
+  "title": "Transparent reporting of a multivariable prediction model for individual prognosis or diagnosis (TRIPOD): the TRIPOD statement",
+  "author": "Collins",
+  "group": "clinical_prediction",
+  "role": "core"
+ },
+ {
+  "key": "christodoulou2019",
+  "doi": "10.1016/j.jclinepi.2019.02.004",
+  "title": "A systematic review shows no performance benefit of machine learning over logistic regression for clinical prediction models",
+  "author": "Christodoulou",
+  "group": "clinical_prediction",
+  "role": "core"
+ },
+ {
+  "key": "rudin2019",
+  "doi": "10.1038/s42256-019-0048-x",
+  "title": "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead",
+  "author": "Rudin",
+  "group": "interpretable_tabular",
+  "role": "core"
+ },
+ {
+  "key": "ustun2016",
+  "doi": "10.1007/s10994-015-5528-6",
+  "title": "Supersparse linear integer models for optimized medical scoring systems",
+  "author": "Ustun",
+  "group": "interpretable_tabular",
+  "role": "core"
+ },
+ {
+  "key": "grinsztajn2022",
+  "arxiv": "2207.08815",
+  "title": "Why do tree-based models still outperform deep learning on tabular data?",
+  "author": "Grinsztajn",
+  "group": "interpretable_tabular",
+  "role": "core"
+ },
+ {
+  "key": "shwartzziv2022",
+  "doi": "10.1016/j.inffus.2021.11.011",
+  "title": "Tabular data: Deep learning is not all you need",
+  "author": "Shwartz-Ziv",
+  "group": "interpretable_tabular",
+  "role": "core"
+ },
+ {
+  "key": "chen2016",
+  "doi": "10.1145/2939672.2939785",
+  "title": "XGBoost: A scalable tree boosting system",
+  "author": "Chen",
+  "group": "software",
+  "role": "software"
+ },
+ {
+  "key": "ke2017",
+  "s2_title": "LightGBM: A Highly Efficient Gradient Boosting Decision Tree",
+  "title": "LightGBM: A highly efficient gradient boosting decision tree",
+  "author": "Ke",
+  "group": "software",
+  "role": "software"
+ },
+ {
+  "key": "prokhorenkova2018",
+  "arxiv": "1706.09516",
+  "title": "CatBoost: unbiased boosting with categorical features",
+  "author": "Prokhorenkova",
+  "group": "software",
+  "role": "software"
+ },
+ {
+  "key": "pedregosa2011",
+  "arxiv": "1201.0490",
+  "title": "Scikit-learn: Machine learning in Python",
+  "author": "Pedregosa",
+  "group": "software",
+  "role": "software"
+ },
+ {
+  "key": "demsar2006",
+  "s2_title": "Statistical Comparisons of Classifiers over Multiple Data Sets",
+  "title": "Statistical comparisons of classifiers over multiple data sets",
+  "author": "Demsar",
+  "group": "evaluation",
+  "role": "core"
+ },
+ {
+  "key": "benavoli2017",
+  "arxiv": "1606.04316",
+  "title": "Time for a change: a tutorial for comparing multiple classifiers through Bayesian analysis",
+  "author": "Benavoli",
+  "group": "evaluation",
+  "role": "method"
+ },
+ {
+  "key": "cawley2010",
+  "s2_title": "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation",
+  "title": "On over-fitting in model selection and subsequent selection bias in performance evaluation",
+  "author": "Cawley",
+  "group": "evaluation",
+  "role": "core"
+ },
+ {
+  "key": "kaufman2012",
+  "doi": "10.1145/2382577.2382579",
+  "title": "Leakage in data mining: Formulation, detection, and avoidance",
+  "author": "Kaufman",
+  "group": "evaluation",
+  "role": "core"
+ },
+ {
+  "key": "saito2015",
+  "doi": "10.1371/journal.pone.0118432",
+  "title": "The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets",
+  "author": "Saito",
+  "group": "evaluation",
+  "role": "method"
+ },
+ {
+  "key": "vanschoren2014",
+  "doi": "10.1145/2641190.2641198",
+  "title": "OpenML: networked science in machine learning",
+  "author": "Vanschoren",
+  "group": "data",
+  "role": "data"
+ },
+ {
+  "key": "detrano1989",
+  "doi": "10.1016/0002-9149(89)90524-9",
+  "title": "International application of a new probability algorithm for the diagnosis of coronary artery disease",
+  "author": "Detrano",
+  "group": "data",
+  "role": "data"
+ },
+ {
+  "key": "nadeau2003",
+  "doi": "10.1023/A:1024068626366",
+  "title": "Inference for the generalization error",
+  "author": "Nadeau",
+  "group": "evaluation",
+  "role": "method"
+ },
+ {
+  "key": "holm1979",
+  "s2_title": "A Simple Sequentially Rejective Multiple Test Procedure",
+  "title": "A simple sequentially rejective multiple test procedure",
+  "author": "Holm",
+  "group": "evaluation",
+  "role": "method"
+ },
+ {
+  "key": "friedman1937",
+  "doi": "10.1080/01621459.1937.10503522",
+  "title": "The use of ranks to avoid the assumption of normality implicit in the analysis of variance",
+  "author": "Friedman",
+  "group": "evaluation",
+  "role": "method"
+ }
 ]

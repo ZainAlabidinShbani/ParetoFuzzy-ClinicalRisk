@@ -1,0 +1,557 @@
+"""Preregistered analysis (PREREGISTRATION.md §5–§6): statistics, figures, LaTeX tables, macros.
+
+Inputs : <results>/records.csv, predictions.csv.gz, fronts.json, rules.json, run_meta.json
+Outputs: <results>/summary_by_dataset.csv, summary_groups.csv, stats.json
+         <tables>/*.tex and <tables>/../generated/macros.tex   (deterministic, byte-stable)
+         <figures>/*.pdf                                        (metadata-free PDFs)
+
+Usage:
+  python scripts/analyze.py [--results results/final] [--paper paper] [--no-figures]
+Every number that appears in the manuscript is written by this script; nothing is hand-typed.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+import re
+from pathlib import Path
+
+os.environ.setdefault("PYTHONUTF8", "1")
+
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+ROOT = Path(__file__).resolve().parents[1]
+
+MODELS = ["LogReg", "DecisionTree", "XGBoost", "LightGBM", "CatBoost", "MLP",
+          "XGBoost+Platt", "XGBoost+Isotonic",
+          "SO-GA-Fuzzy(classic)", "SO-GA-Fuzzy(hybrid)", "MO-Fuzzy(NSGA-II)"]
+ABLATION = "MO-Fuzzy(best-Brier)"
+MO = "MO-Fuzzy(NSGA-II)"
+CLASSIC = "SO-GA-Fuzzy(classic)"
+HYBRID = "SO-GA-Fuzzy(hybrid)"
+GBDTS = ["XGBoost", "LightGBM", "CatBoost"]
+DEV = ["pima_diabetes", "heart_cleveland"]
+HELDOUT = ["breast_wdbc", "liver_ilpd", "thyroid_sick", "kidney_ckd"]
+DATASETS = DEV + HELDOUT
+DNAME = {"pima_diabetes": "Pima", "heart_cleveland": "Cleveland", "breast_wdbc": "WDBC",
+         "liver_ilpd": "ILPD", "thyroid_sick": "Thyroid", "kidney_ckd": "CKD"}
+MNAME = {"LogReg": "LogReg", "DecisionTree": "Decision tree", "XGBoost": "XGBoost",
+         "LightGBM": "LightGBM", "CatBoost": "CatBoost", "MLP": "MLP",
+         "XGBoost+Platt": "XGBoost + Platt", "XGBoost+Isotonic": "XGBoost + isotonic",
+         CLASSIC: "SO-GA-Fuzzy (classic)", HYBRID: "SO-GA-Fuzzy (hybrid)",
+         MO: "MO-Fuzzy (NSGA-II)", ABLATION: "MO-Fuzzy (best-Brier)"}
+HIGHER_BETTER = {"auroc": True, "pr_auc": True, "brier": False, "ece": False, "log_loss": False}
+# validated categorical palette (dataviz reference instance, light mode)
+C_BLUE, C_ORANGE, C_AQUA, C_YELLOW = "#257de0", "#f47230", "#00b894", "#f2a600"
+C_GRAY, C_TEXT, C_TEXT2, C_GRID = "#9c9c9c", "#191919", "#666666", "#e5e5e5"
+
+
+# --------------------------------------------------------------------------- #
+# statistics
+# --------------------------------------------------------------------------- #
+def holm(pvals):
+    p = np.asarray(pvals, float)
+    order = np.argsort(p)
+    adj = np.empty_like(p)
+    running = 0.0
+    m = len(p)
+    for rank, i in enumerate(order):
+        running = max(running, (m - rank) * p[i])
+        adj[i] = min(1.0, running)
+    return adj
+
+
+def nb_corrected_ttest(d, test_train_ratio=0.25):
+    """Nadeau & Bengio (2003) corrected resampled t-test on J paired fold differences."""
+    d = np.asarray(d, float)
+    J = len(d)
+    var = d.var(ddof=1)
+    if var == 0:
+        return float("nan"), 1.0
+    t = d.mean() / math.sqrt((1.0 / J + test_train_ratio) * var)
+    return float(t), float(2 * stats.t.sf(abs(t), df=J - 1))
+
+
+def ranks_matrix(M: pd.DataFrame, higher_better: bool) -> pd.DataFrame:
+    """Rows = datasets, columns = models; rank 1 = best, ties averaged."""
+    return M.apply(lambda r: pd.Series(stats.rankdata(-r.values if higher_better else r.values),
+                                       index=r.index), axis=1)
+
+
+def nemenyi_cd(k: int, n: int, alpha: float = 0.05) -> float:
+    q = stats.studentized_range.ppf(1 - alpha, k, np.inf) / math.sqrt(2)
+    return float(q * math.sqrt(k * (k + 1) / (6.0 * n)))
+
+
+def wilcoxon_p(x, y, alternative="two-sided"):
+    d = np.asarray(x, float) - np.asarray(y, float)
+    if np.allclose(d, 0):
+        return 1.0
+    return float(stats.wilcoxon(x, y, alternative=alternative, method="exact").pvalue)
+
+
+# --------------------------------------------------------------------------- #
+def fmt(x, d=3):
+    if x is None or (isinstance(x, float) and not np.isfinite(x)):
+        return "--"
+    return f"{x:.{d}f}"
+
+
+def fmt_p(p):
+    if not np.isfinite(p):
+        return "--"
+    return "$<$0.001" if p < 0.001 else f"{p:.3f}"
+
+
+def tex_escape(s: str) -> str:
+    return (s.replace("\\", r"\textbackslash{}").replace("_", r"\_").replace("&", r"\&")
+            .replace("%", r"\%").replace("#", r"\#").replace(">", r"$>$").replace("<", r"$<$"))
+
+
+def macro_name(*parts) -> str:
+    s = "".join(p[:1].upper() + p[1:] for p in re.sub(r"[^A-Za-z ]", " ", " ".join(parts)).split())
+    return "res" + s
+
+
+class Macros:
+    def __init__(self):
+        self.items = {}
+
+    def add(self, name, value):
+        if name in self.items and self.items[name] != value:
+            raise ValueError(f"macro {name} redefined")
+        self.items[name] = value
+
+    def write(self, path: Path):
+        lines = ["% AUTO-GENERATED by scripts/analyze.py from results/final -- do not edit."]
+        for k in sorted(self.items):
+            lines.append(f"\\newcommand{{\\{k}}}{{{self.items[k]}}}")
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+# --------------------------------------------------------------------------- #
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--results", default=str(ROOT / "results" / "final"))
+    ap.add_argument("--paper", default=str(ROOT / "paper"))
+    ap.add_argument("--no-figures", action="store_true")
+    args = ap.parse_args()
+    res = Path(args.results)
+    paper = Path(args.paper)
+    tabdir, gendir, figdir = paper / "tables", paper / "generated", paper / "figures"
+    for d in (tabdir, gendir, figdir):
+        d.mkdir(parents=True, exist_ok=True)
+
+    R = pd.read_csv(res / "records.csv")
+    meta = json.loads((res / "run_meta.json").read_text(encoding="utf-8"))
+    assert set(R.dataset) == set(DATASETS), sorted(set(R.dataset))
+    n_seeds = R.seed.nunique()
+    n_folds_per = R.groupby(["dataset", "model"]).size()
+    assert (n_folds_per == n_seeds * 5).all(), "incomplete records"
+    J = int(n_folds_per.iloc[0])
+    mac = Macros()
+
+    # ---------------- per-dataset summaries ----------------
+    metrics = ["auroc", "pr_auc", "brier", "log_loss", "ece", "ece_adaptive", "cal_slope", "cal_intercept",
+               "n_rules", "mean_antecedents", "complexity", "fit_s", "predict_s", "peak_rss_mb", "test_hv",
+               "inner_hv", "lambda", "archive_size"]
+    metrics = [m for m in metrics if m in R.columns]
+    G = R.groupby(["dataset", "model"])[metrics]
+    S = G.mean().add_suffix("_mean").join(G.std(ddof=1).add_suffix("_sd")).reset_index()
+    S["abs_slope_dev_median"] = R.assign(a=(R.cal_slope - 1).abs()).groupby(["dataset", "model"]).a.median().values
+    S["dataset"] = pd.Categorical(S.dataset, DATASETS, ordered=True)
+    S["model"] = pd.Categorical(S.model, MODELS + [ABLATION], ordered=True)
+    S = S.sort_values(["dataset", "model"]).reset_index(drop=True)
+    S.round(6).to_csv(res / "summary_by_dataset.csv", index=False, encoding="utf-8")
+
+    def mean_of(model, ds, metric):
+        r = S[(S.model == model) & (S.dataset == ds)]
+        return float(r[f"{metric}_mean"].iloc[0])
+
+    def table_matrix(metric, models=MODELS):
+        return pd.DataFrame({ds: [mean_of(m, ds, metric) for m in models] for ds in DATASETS},
+                            index=models).T  # rows datasets, cols models
+
+    # group summaries (mean of dataset means, mean rank)
+    grp_rows = []
+    for gname, dss in (("dev", DEV), ("heldout", HELDOUT), ("all", DATASETS)):
+        for metric in ("auroc", "brier", "ece", "pr_auc"):
+            M = table_matrix(metric).loc[dss]
+            rk = ranks_matrix(M, HIGHER_BETTER[metric])
+            for m in MODELS:
+                grp_rows.append({"group": gname, "metric": metric, "model": m,
+                                 "mean_of_dataset_means": M[m].mean(), "mean_rank": rk[m].mean()})
+    GS = pd.DataFrame(grp_rows)
+    GS.round(6).to_csv(res / "summary_groups.csv", index=False, encoding="utf-8")
+
+    # ---------------- across-dataset tests (§6.2) ----------------
+    st = {"n_datasets": len(DATASETS), "k_models": len(MODELS), "folds_per_dataset": J}
+    for metric in ("auroc", "brier"):
+        M = table_matrix(metric)
+        rk = ranks_matrix(M, HIGHER_BETTER[metric])
+        chi2, p = stats.friedmanchisquare(*[M[m].values for m in MODELS])
+        cd = nemenyi_cd(len(MODELS), len(DATASETS))
+        avg = rk.mean().reindex(MODELS)
+        pw = {m: wilcoxon_p(M[MO].values, M[m].values) for m in MODELS if m != MO}
+        adj = dict(zip(pw, holm(list(pw.values()))))
+        st[metric] = {"friedman_chi2": float(chi2), "friedman_p": float(p), "nemenyi_cd": cd,
+                      "avg_ranks": {m: float(avg[m]) for m in MODELS},
+                      "wilcoxon_vs_MO": {m: {"p": pw[m], "p_holm": float(adj[m]),
+                                             "mean_diff_MO_minus": float((M[MO] - M[m]).mean())}
+                                         for m in pw}}
+        mac.add(macro_name("friedman", metric, "chi"), fmt(chi2, 2))
+        mac.add(macro_name("friedman", metric, "p"), fmt_p(p))
+        mac.add(macro_name("cd", metric), fmt(cd, 2))
+        mac.add(macro_name("rank MO", metric), fmt(avg[MO], 2))
+        best_m = avg.idxmin()
+        mac.add(macro_name("best rank model", metric), tex_escape(MNAME[best_m]))
+        mac.add(macro_name("best rank", metric), fmt(avg[best_m], 2))
+        mac.add(macro_name("min wilcoxon p holm", metric),
+                fmt_p(min(v["p_holm"] for v in st[metric]["wilcoxon_vs_MO"].values())))
+    mac.add("resCDq", fmt(stats.studentized_range.ppf(0.95, len(MODELS), np.inf) / math.sqrt(2), 3))
+
+    # ---------------- per-dataset NB corrected t-tests (§6.3) ----------------
+    nb = {}
+    for ds in DATASETS:
+        nb[ds] = {}
+        for metric in ("auroc", "brier"):
+            base = R[(R.dataset == ds) & (R.model == MO)].sort_values(["seed", "fold"])
+            out = {}
+            for m in MODELS:
+                if m == MO:
+                    continue
+                oth = R[(R.dataset == ds) & (R.model == m)].sort_values(["seed", "fold"])
+                d = base[metric].values - oth[metric].values
+                t, p = nb_corrected_ttest(d)
+                out[m] = {"mean_diff": float(d.mean()), "t": t, "p": p}
+            adj = holm([v["p"] for v in out.values()])
+            for (m, v), a in zip(out.items(), adj):
+                v["p_holm"] = float(a)
+            nb[ds][metric] = out
+    st["nb_corrected_ttests"] = nb
+
+    # ---------------- hypotheses (§5) ----------------
+    H = {}
+    br = table_matrix("brier")
+    h1_wins = int((br[MO] < br[CLASSIC]).sum())
+    h1_p = wilcoxon_p(br[MO].values, br[CLASSIC].values, alternative="less")
+    H["H1"] = {"wins": h1_wins, "wilcoxon_p_one_sided": h1_p, "supported": bool(h1_wins >= 5 and h1_p < 0.05),
+               "per_dataset": {ds: [float(br.loc[ds, MO]), float(br.loc[ds, CLASSIC])] for ds in DATASETS}}
+    au = table_matrix("auroc")
+    gb = au[GBDTS].max(axis=1)
+    h2_ok = (au[MO] >= gb - 0.02)
+    H["H2"] = {"n_noninferior": int(h2_ok.sum()), "supported": bool(h2_ok.sum() >= 4),
+               "per_dataset": {ds: {"MO": float(au.loc[ds, MO]), "best_gbdt": float(gb[ds]),
+                                    "best_gbdt_model": au.loc[ds, GBDTS].idxmax(),
+                                    "delta": float(au.loc[ds, MO] - gb[ds]), "ok": bool(h2_ok[ds])}
+                               for ds in DATASETS}}
+    sl = pd.DataFrame({ds: {m: float(S[(S.model == m) & (S.dataset == ds)].abs_slope_dev_median.iloc[0])
+                            for m in (MO, CLASSIC)} for ds in DATASETS}).T
+    h3_wins = int((sl[MO] < sl[CLASSIC]).sum())
+    h3_p = wilcoxon_p(sl[MO].values, sl[CLASSIC].values, alternative="less")
+    H["H3"] = {"wins": h3_wins, "wilcoxon_p_one_sided": h3_p, "supported": bool(h3_wins >= 4 and h3_p < 0.05),
+               "per_dataset": {ds: [float(sl.loc[ds, MO]), float(sl.loc[ds, CLASSIC])] for ds in DATASETS}}
+    lit = table_matrix("complexity", [MO, HYBRID])
+    ratio = lit[MO] / lit[HYBRID]
+    loss = au[HYBRID] - au[MO]
+    H["H4"] = {"literal_ratio": {ds: float(ratio[ds]) for ds in DATASETS},
+               "auroc_loss": {ds: float(loss[ds]) for ds in DATASETS},
+               "n_ratio_ok": int((ratio <= 0.5).sum()), "n_loss_ok": int((loss <= 0.01).sum()),
+               "supported": bool((ratio <= 0.5).all() and (loss <= 0.01).sum() >= 4)}
+    st["hypotheses"] = H
+    sup = lambda b: "supported" if b else "not supported"  # noqa: E731
+    mac.add("resHOneWins", str(h1_wins)); mac.add("resHOneP", fmt_p(h1_p)); mac.add("resHOne", sup(H["H1"]["supported"]))
+    mac.add("resHTwoN", str(int(h2_ok.sum()))); mac.add("resHTwo", sup(H["H2"]["supported"]))
+    mac.add("resHThreeWins", str(h3_wins)); mac.add("resHThreeP", fmt_p(h3_p)); mac.add("resHThree", sup(H["H3"]["supported"]))
+    mac.add("resHFourRatioN", str(H["H4"]["n_ratio_ok"])); mac.add("resHFourLossN", str(H["H4"]["n_loss_ok"]))
+    mac.add("resHFour", sup(H["H4"]["supported"]))
+    mac.add("resHFourRatioMax", fmt(float(ratio.max()), 2)); mac.add("resHFourRatioMin", fmt(float(ratio.min()), 2))
+
+    # ---------------- Pareto / archive ----------------
+    fronts = json.loads((res / "fronts.json").read_text(encoding="utf-8"))
+    hv_rows = []
+    for ds in DATASETS:
+        sub = S[(S.dataset == ds) & (S.model == MO)].iloc[0]
+        lam = R[(R.dataset == ds) & (R.model == MO)]["lambda"]
+        hv_rows.append({"dataset": ds, "inner_hv": sub.inner_hv_mean, "inner_hv_sd": sub.inner_hv_sd,
+                        "test_hv": sub.test_hv_mean, "test_hv_sd": sub.test_hv_sd,
+                        "archive": sub.archive_size_mean,
+                        "lam_mode": float(lam.mode().iloc[0]) if lam.notna().any() else float("nan")})
+    HV = pd.DataFrame(hv_rows)
+    st["pareto"] = HV.round(6).to_dict(orient="records")
+
+    # ---------------- global numbers ----------------
+    mac.add("resNFits", f"{meta['n_fits']:,}".replace(",", "{,}"))
+    mac.add("resNSeeds", str(n_seeds))
+    mac.add("resFoldsPerDataset", str(J))
+    mac.add("resWallHours", fmt(meta["wall_time_s_all_sessions"] / 3600, 1))
+    mac.add("resComputeHours", fmt(meta["sum_fit_plus_predict_s"] / 3600, 1))
+    mac.add("resMaxRSS", f"{meta['max_fit_peak_rss_mb']:.0f}")
+    for ds in DATASETS:
+        k = DNAME[ds]
+        mac.add(macro_name("MO auroc", k), fmt(mean_of(MO, ds, "auroc")))
+        mac.add(macro_name("MO brier", k), fmt(mean_of(MO, ds, "brier")))
+        mac.add(macro_name("MO ece", k), fmt(mean_of(MO, ds, "ece")))
+        mac.add(macro_name("MO literals", k), fmt(mean_of(MO, ds, "complexity"), 1))
+        mac.add(macro_name("MO rules", k), fmt(mean_of(MO, ds, "n_rules"), 1))
+        mac.add(macro_name("MO slope", k), fmt(mean_of(MO, ds, "cal_slope"), 2))
+        mac.add(macro_name("classic brier", k), fmt(mean_of(CLASSIC, ds, "brier")))
+        mac.add(macro_name("hybrid literals", k), fmt(mean_of(HYBRID, ds, "complexity"), 1))
+        bA = au.loc[ds].idxmax()
+        mac.add(macro_name("best auroc model", k), tex_escape(MNAME[bA]))
+        mac.add(macro_name("best auroc", k), fmt(au.loc[ds].max()))
+        bB = br.loc[ds].idxmin()
+        mac.add(macro_name("best brier model", k), tex_escape(MNAME[bB]))
+        mac.add(macro_name("best brier", k), fmt(br.loc[ds].min()))
+        mac.add(macro_name("gbdt gap", k), fmt(float(au.loc[ds, MO] - gb[ds]), 3))
+        mac.add(macro_name("test hv", k), fmt(float(HV.set_index("dataset").loc[ds, "test_hv"]), 3))
+    for gname, dss in (("dev", DEV), ("heldout", HELDOUT), ("all", DATASETS)):
+        mac.add(macro_name("MO auroc", gname), fmt(au.loc[dss, MO].mean()))
+        mac.add(macro_name("MO brier", gname), fmt(br.loc[dss, MO].mean()))
+        mac.add(macro_name("MO literals", gname), fmt(lit.loc[dss, MO].mean(), 1))
+        mac.add(macro_name("hybrid literals", gname), fmt(lit.loc[dss, HYBRID].mean(), 1))
+    fit = R.groupby("model").fit_s.mean()
+    for m in (MO, HYBRID, CLASSIC, "CatBoost", "XGBoost", "LogReg"):
+        mac.add(macro_name("fit", MNAME[m]), fmt(float(fit[m]), 1))
+
+    (res / "stats.json").write_text(json.dumps(st, indent=2, sort_keys=True), encoding="utf-8")
+
+    # ---------------- LaTeX tables ----------------
+    write_tables(S, st, HV, tabdir, mac, res)
+    mac.write(gendir / "macros.tex")
+
+    if not args.no_figures:
+        import figures  # noqa: E402  (scripts/figures.py)
+        figures.make_all(R, S, fronts, res, figdir, mac_items=mac.items)
+    print(f"analysis written: {res}, {tabdir}, {gendir / 'macros.tex'}"
+          + ("" if args.no_figures else f", {figdir}"))
+
+
+# --------------------------------------------------------------------------- #
+def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
+    def cell(m, ds, metric, d=3, sd=True):
+        r = S[(S.model == m) & (S.dataset == ds)].iloc[0]
+        mu, s = r[f"{metric}_mean"], r[f"{metric}_sd"]
+        return (fmt(mu, d) + (r"\,$\pm$\," + fmt(s, d) if sd else "")) if np.isfinite(mu) else "--"
+
+    def metric_table(metric, caption, label, d=3, models=MODELS + [ABLATION]):
+        hb = HIGHER_BETTER.get(metric)
+        lines = [r"\begin{table*}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{3pt}",
+                 rf"\caption{{{caption}}}", rf"\label{{{label}}}",
+                 r"\begin{tabular}{l" + "c" * len(DATASETS) + "}", r"\toprule",
+                 r" & \multicolumn{2}{c}{Development} & \multicolumn{4}{c}{Held-out} \\",
+                 r"\cmidrule(lr){2-3}\cmidrule(lr){4-7}",
+                 "Model & " + " & ".join(DNAME[d_] for d_ in DATASETS) + r" \\", r"\midrule"]
+        best = {}
+        for ds in DATASETS:
+            vals = {m: float(S[(S.model == m) & (S.dataset == ds)][f"{metric}_mean"].iloc[0]) for m in MODELS}
+            if hb is None:  # calibration slope: closest to 1
+                best[ds] = min(vals, key=lambda m: abs(vals[m] - 1))
+            else:
+                best[ds] = (max if hb else min)(vals, key=vals.get)
+        for m in models:
+            if m == ABLATION:
+                lines.append(r"\midrule")
+            cells = []
+            for ds in DATASETS:
+                c = cell(m, ds, metric, d)
+                cells.append(rf"\textbf{{{c}}}" if best[ds] == m else c)
+            name = MNAME[m] + (r"$^\dagger$" if m == ABLATION else "")
+            lines.append(f"{name} & " + " & ".join(cells) + r" \\")
+        lines += [r"\bottomrule", r"\end{tabular}", r"\end{table*}"]
+        (tabdir / f"{label.split(':')[1]}.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    note = (r"Mean\,$\pm$\,SD over {J} outer test folds (5 seeds $\times$ 5 folds); bold = best of the 11 "
+            r"preregistered models per dataset. $^\dagger$Ablation from the same NSGA-II runs (not ranked).")
+    J = st["folds_per_dataset"]
+    metric_table("auroc", "AUROC (higher is better). " + note.format(J=J), "tab:auroc")
+    metric_table("brier", "Brier score (lower is better). " + note.format(J=J), "tab:brier")
+    metric_table("ece", "Expected calibration error, 10 equal-width bins (lower is better). " + note.format(J=J),
+                 "tab:ece")
+    metric_table("pr_auc", "PR-AUC (higher is better). " + note.format(J=J), "tab:prauc")
+    metric_table("cal_slope", "Calibration slope (ideal 1; bold = closest to 1). " + note.format(J=J),
+                 "tab:slope", d=2)
+
+    # complexity & cost
+    lines = [r"\begin{table}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{3pt}",
+             r"\caption{Interpretability and cost, averaged over all datasets and folds. Rules = distinct "
+             r"active rules (fuzzy) or leaves (tree); literals = antecedent conditions summed over rules "
+             r"(tree: sum of leaf depths). Fit time includes inner tuning or evolution, single-threaded.}",
+             r"\label{tab:complexity}", r"\begin{tabular}{lrrrrr}", r"\toprule",
+             r"Model & Rules & Ante./rule & Literals & Fit (s) & Peak RSS (MB) \\", r"\midrule"]
+    for m in MODELS + [ABLATION]:
+        sub = S[S.model == m]
+        def g(c, d):
+            v = sub[f"{c}_mean"].mean()
+            return fmt(v, d) if np.isfinite(v) else "--"
+        rss = sub["peak_rss_mb_mean"].max()
+        fit = "--" if m == ABLATION else g("fit_s", 1)
+        lines.append(f"{MNAME[m]} & {g('n_rules', 1)} & {g('mean_antecedents', 2)} & {g('complexity', 1)} & "
+                     f"{fit} & {rss:.0f} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (tabdir / "complexity.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    # ranks & across-dataset tests
+    lines = [r"\begin{table}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{4pt}",
+             r"\caption{Average ranks over the 6 datasets (1 = best) and two-sided exact Wilcoxon signed-rank "
+             r"tests of MO-Fuzzy against each model on dataset means, Holm-corrected. With $N=6$ the smallest "
+             r"attainable two-sided $p$ is 0.031, so no comparison can survive Holm correction (declared in "
+             r"the preregistration).}", r"\label{tab:ranks}", r"\begin{tabular}{lrrrrrr}", r"\toprule",
+             r" & \multicolumn{3}{c}{AUROC} & \multicolumn{3}{c}{Brier} \\",
+             r"\cmidrule(lr){2-4}\cmidrule(lr){5-7}",
+             r"Model & Rank & $p$ & $p_{\mathrm{Holm}}$ & Rank & $p$ & $p_{\mathrm{Holm}}$ \\", r"\midrule"]
+    for m in MODELS:
+        row = [MNAME[m]]
+        for metric in ("auroc", "brier"):
+            row.append(fmt(st[metric]["avg_ranks"][m], 2))
+            w = st[metric]["wilcoxon_vs_MO"].get(m)
+            row += ["--", "--"] if w is None else [fmt_p(w["p"]), fmt_p(w["p_holm"])]
+        lines.append(" & ".join(row) + r" \\")
+    lines += [r"\midrule",
+              rf"Friedman $\chi^2_{{10}}$ & \multicolumn{{3}}{{c}}{{{fmt(st['auroc']['friedman_chi2'], 2)} "
+              rf"($p={fmt_p(st['auroc']['friedman_p'])}$)}} & \multicolumn{{3}}{{c}}"
+              rf"{{{fmt(st['brier']['friedman_chi2'], 2)} ($p={fmt_p(st['brier']['friedman_p'])}$)}} \\",
+              rf"Nemenyi CD ($\alpha=0.05$) & \multicolumn{{3}}{{c}}{{{fmt(st['auroc']['nemenyi_cd'], 2)}}} & "
+              rf"\multicolumn{{3}}{{c}}{{{fmt(st['brier']['nemenyi_cd'], 2)}}} \\",
+              r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (tabdir / "ranks.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    # per-dataset NB tests: MO minus model, significance after Holm
+    lines = [r"\begin{table*}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{3pt}",
+             r"\caption{Per-dataset difference MO-Fuzzy $-$ model (AUROC / Brier) with Nadeau--Bengio corrected "
+             r"resampled $t$-tests over 25 paired folds, Holm-corrected within dataset and metric. "
+             r"$^{*}$: $p_{\mathrm{Holm}}<0.05$. Positive AUROC and negative Brier differences favour MO-Fuzzy.}",
+             r"\label{tab:nb}", r"\begin{tabular}{l" + "c" * len(DATASETS) + "}", r"\toprule",
+             "Model & " + " & ".join(DNAME[d] for d in DATASETS) + r" \\", r"\midrule"]
+    for m in MODELS:
+        if m == MO:
+            continue
+        cells = []
+        for ds in DATASETS:
+            parts = []
+            for metric in ("auroc", "brier"):
+                v = st["nb_corrected_ttests"][ds][metric][m]
+                star = "$^{*}$" if v["p_holm"] < 0.05 else ""
+                parts.append(f"{v['mean_diff']:+.3f}{star}")
+            cells.append(" / ".join(parts))
+        lines.append(f"{MNAME[m]} & " + " & ".join(cells) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table*}"]
+    (tabdir / "nb_tests.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    # hypotheses
+    H = st["hypotheses"]
+    yn = lambda b: r"\textbf{Supported}" if b else "Not supported"  # noqa: E731
+    rows = [
+        ("H1", r"Brier: MO-Fuzzy $<$ SO-GA-Fuzzy (classic) on $\geq$5/6 datasets and one-sided Wilcoxon $p<0.05$",
+         f"{H['H1']['wins']}/6, $p={fmt_p(H['H1']['wilcoxon_p_one_sided'])}$", yn(H["H1"]["supported"])),
+        ("H2", r"AUROC: MO-Fuzzy $\geq$ best GBDT $-0.02$ on $\geq$4/6 datasets",
+         f"{H['H2']['n_noninferior']}/6", yn(H["H2"]["supported"])),
+        ("H3", r"$|$slope$-1|$: MO-Fuzzy $<$ SO-GA-Fuzzy (classic) on $\geq$4/6 and one-sided Wilcoxon $p<0.05$",
+         f"{H['H3']['wins']}/6, $p={fmt_p(H['H3']['wilcoxon_p_one_sided'])}$", yn(H["H3"]["supported"])),
+        ("H4", r"Literals: MO $\leq 0.5\times$ SO-hybrid on 6/6 and AUROC loss $\leq 0.01$ on $\geq$4/6",
+         f"{H['H4']['n_ratio_ok']}/6 and {H['H4']['n_loss_ok']}/6", yn(H["H4"]["supported"])),
+    ]
+    lines = [r"\begin{table}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{3pt}",
+             r"\caption{Preregistered hypotheses (PREREGISTRATION.md \S5) and outcomes.}", r"\label{tab:hyp}",
+             r"\begin{tabular}{lp{5.4cm}lp{1.6cm}}", r"\toprule", r"ID & Criterion & Observed & Outcome \\",
+             r"\midrule"]
+    for r_ in rows:
+        lines.append(" & ".join(r_) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (tabdir / "hypotheses.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    # Pareto / archive table
+    lines = [r"\begin{table}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{4pt}",
+             r"\caption{External-archive statistics of MO-Fuzzy (mean\,$\pm$\,SD over folds): normalised "
+             r"hypervolume on inner out-of-fold objectives and on the outer test fold (refitted archive "
+             r"members), archive size, and modal selected $\lambda$ of the deployed rule base.}",
+             r"\label{tab:pareto}", r"\begin{tabular}{lcccc}", r"\toprule",
+             r"Dataset & HV (inner) & HV (test) & Archive size & Modal $\lambda$ \\", r"\midrule"]
+    for _, r_ in HV.iterrows():
+        lines.append(f"{DNAME[r_.dataset]} & {fmt(r_.inner_hv)}\\,$\\pm$\\,{fmt(r_.inner_hv_sd)} & "
+                     f"{fmt(r_.test_hv)}\\,$\\pm$\\,{fmt(r_.test_hv_sd)} & {fmt(r_.archive, 1)} & "
+                     f"{r_.lam_mode:g} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (tabdir / "pareto.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    write_rule_tables(res, tabdir, mac)
+    write_dataset_table(tabdir, res)
+
+
+def representative_fold(R, ds):
+    sub = R[(R.dataset == ds) & (R.model == MO)].sort_values(["seed", "fold"])
+    med = sub.auroc.median()
+    i = (sub.auroc - med).abs().values.argmin()
+    return int(sub.seed.iloc[i]), int(sub.fold.iloc[i])
+
+
+RULE_DATASETS = ["heart_cleveland", "thyroid_sick"]
+
+
+def parse_rules(lines):
+    base, rules, mfs = None, [], []
+    for ln in lines:
+        if ln.startswith("BASELINE"):
+            base = float(ln.split("=")[1])
+        elif ln.startswith("R"):
+            m = re.match(r"R(\d+): IF (.*) THEN ([+-][0-9.]+) log-odds", ln)
+            rules.append((m.group(2), float(m.group(3))))
+        elif ln.startswith("MF "):
+            m = re.match(r"MF (.*): Low/Medium/High centres = (.*)", ln)
+            mfs.append((m.group(1), [float(v) for v in m.group(2).split(",")]))
+    return base, rules, mfs
+
+
+def write_rule_tables(res, tabdir, mac):
+    R = pd.read_csv(res / "records.csv")
+    rules = json.loads((res / "rules.json").read_text(encoding="utf-8"))
+    for ds in RULE_DATASETS:
+        s, f = representative_fold(R, ds)
+        entry = next(r for r in rules if r["dataset"] == ds and r["seed"] == s and r["fold"] == f
+                     and r["model"] == MO)
+        base, rl, mfs = parse_rules(entry["rules"])
+        rec = R[(R.dataset == ds) & (R.model == MO) & (R.seed == s) & (R.fold == f)].iloc[0]
+        lines = [r"\begin{table}[t]", r"\centering", r"\scriptsize",
+                 rf"\caption{{Deployed MO-Fuzzy rule base for {DNAME[ds]} (seed {s}, fold {f}: the fold whose test "
+                 rf"AUROC is closest to the median over 25 folds; test AUROC {fmt(rec.auroc)}, Brier "
+                 rf"{fmt(rec.brier)}). Risk score: $\mathrm{{logit}}\,\hat p = w_0 + \sum_r w_r \beta_r(x)$. "
+                 rf"Membership-function centres in original units.}}",
+                 rf"\label{{tab:rules_{ds}}}", r"\begin{tabular}{p{0.6cm}p{5.2cm}r}", r"\toprule",
+                 r"Rule & IF (antecedents) & $w_r$ (log-odds) \\", r"\midrule",
+                 rf"$w_0$ & baseline & {base:+.3f} \\"]
+        for i, (cond, w) in enumerate(rl, 1):
+            lines.append(rf"R{i} & {tex_escape(cond)} & {w:+.3f} \\")
+        if mfs:
+            lines += [r"\midrule", r"\multicolumn{3}{l}{Low / Medium / High centres:} \\"]
+            for name, c in mfs:
+                lines.append(rf"\multicolumn{{3}}{{l}}{{\quad {tex_escape(name)}: "
+                             + ", ".join(f"{v:.3g}" for v in c) + r"} \\")
+        lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+        (tabdir / f"rules_{ds}.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        mac.add(macro_name("rules n", DNAME[ds]), str(len(rl)))
+
+
+def write_dataset_table(tabdir, res):
+    info = json.loads((res / "dataset_info.json").read_text(encoding="utf-8"))
+    lines = [r"\begin{table}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{3pt}",
+             r"\caption{Datasets. Development datasets were used for all design decisions and the pilot; "
+             r"held-out datasets were unlocked only after the preregistration was locked. Features: "
+             r"numeric / binary / nominal before one-hot encoding.}", r"\label{tab:datasets}",
+             r"\begin{tabular}{llrrrl}", r"\toprule",
+             r"Dataset & Role & $n$ & Prev. & Features & Source \\", r"\midrule"]
+    for ds in DATASETS:
+        d = info[ds]
+        lines.append(f"{DNAME[ds]} & {'dev' if ds in DEV else 'held-out'} & {d['n']} & {d['prevalence']:.3f} & "
+                     f"{d['n_num']}/{d['n_bin']}/{d['n_nom']} & {tex_escape(d['source'])} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (tabdir / "datasets.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    main()

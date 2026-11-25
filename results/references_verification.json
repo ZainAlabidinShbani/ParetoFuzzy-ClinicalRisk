@@ -1,8 +1,8 @@
 {
-  "generated_utc": "2026-11-25T20:15:02+00:00",
+  "generated_utc": "2026-11-25T23:10:54+00:00",
   "method": "Crossref /works/{doi}; arXiv Atom API; Semantic Scholar graph API (search/match). Accepted iff normalised title similarity >= 0.9 and first-author surname match. BibTeX generated only from fetched metadata.",
-  "n_candidates": 50,
-  "n_verified": 50,
+  "n_candidates": 53,
+  "n_verified": 53,
   "n_verified_core": 35,
   "entries": [
     {
@@ -852,7 +852,7 @@
       "fetched_title": "Time for a change: a tutorial for comparing multiple classifiers through Bayesian analysis",
       "fetched_first_author": "Benavoli",
       "fetched_year": 2016,
-      "fetched_venue": "Journal of machine learning research",
+      "fetched_venue": null,
       "source": "arxiv",
       "doi": null,
       "url": "https://arxiv.org/abs/1606.04316",
@@ -951,6 +951,63 @@
       "source": "crossref",
       "doi": "10.1016/0002-9149(89)90524-9",
       "url": "https://doi.org/10.1016/0002-9149(89)90524-9",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "nadeau2003",
+      "group": "evaluation",
+      "role": "method",
+      "query": {
+        "doi": "10.1023/A:1024068626366"
+      },
+      "expected_title": "Inference for the generalization error",
+      "fetched_title": "Inference for the Generalization Error",
+      "fetched_first_author": "Nadeau",
+      "fetched_year": 2003,
+      "fetched_venue": "Machine Learning",
+      "source": "crossref",
+      "doi": "10.1023/a:1024068626366",
+      "url": "https://doi.org/10.1023/a:1024068626366",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "holm1979",
+      "group": "evaluation",
+      "role": "method",
+      "query": {
+        "s2_title": "A Simple Sequentially Rejective Multiple Test Procedure"
+      },
+      "expected_title": "A simple sequentially rejective multiple test procedure",
+      "fetched_title": "A Simple Sequentially Rejective Multiple Test Procedure",
+      "fetched_first_author": "Holm",
+      "fetched_year": 1979,
+      "fetched_venue": null,
+      "source": "semanticscholar",
+      "doi": "10.2307/4615733",
+      "url": "https://www.semanticscholar.org/paper/b0ebbcf713b3ddf3f94325bc58dc39ff76fdc412",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "friedman1937",
+      "group": "evaluation",
+      "role": "method",
+      "query": {
+        "doi": "10.1080/01621459.1937.10503522"
+      },
+      "expected_title": "The use of ranks to avoid the assumption of normality implicit in the analysis of variance",
+      "fetched_title": "The Use of Ranks to Avoid the Assumption of Normality Implicit in the Analysis of Variance",
+      "fetched_first_author": "Friedman",
+      "fetched_year": 1937,
+      "fetched_venue": "Journal of the American Statistical Association",
+      "source": "crossref",
+      "doi": "10.1080/01621459.1937.10503522",
+      "url": "https://doi.org/10.1080/01621459.1937.10503522",
       "title_similarity": 1.0,
       "first_author_match": true,
       "verified": true
