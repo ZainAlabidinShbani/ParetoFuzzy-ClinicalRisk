@@ -1,0 +1,37 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Data (fetched on demand with checksums; never committed)
+data/raw/
+data/cache/
+catboost_info/
+
+# Large / transient experiment artefacts
+results/cache/
+results/**/tmp/
+*.joblib
+
+# LaTeX build artefacts
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.spl
+paper/*.toc
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+paper/*.pdf

@@ -1,0 +1,959 @@
+{
+  "generated_utc": "2026-11-25T20:15:02+00:00",
+  "method": "Crossref /works/{doi}; arXiv Atom API; Semantic Scholar graph API (search/match). Accepted iff normalised title similarity >= 0.9 and first-author surname match. BibTeX generated only from fetched metadata.",
+  "n_candidates": 50,
+  "n_verified": 50,
+  "n_verified_core": 35,
+  "entries": [
+    {
+      "key": "zadeh1965",
+      "group": "foundations",
+      "role": "method",
+      "query": {
+        "doi": "10.1016/S0019-9958(65)90241-X"
+      },
+      "expected_title": "Fuzzy sets",
+      "fetched_title": "Fuzzy sets",
+      "fetched_first_author": "Zadeh",
+      "fetched_year": 1965,
+      "fetched_venue": "Information and Control",
+      "source": "crossref",
+      "doi": "10.1016/s0019-9958(65)90241-x",
+      "url": "https://doi.org/10.1016/s0019-9958(65)90241-x",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "mamdani1975",
+      "group": "foundations",
+      "role": "method",
+      "query": {
+        "doi": "10.1016/S0020-7373(75)80002-2"
+      },
+      "expected_title": "An experiment in linguistic synthesis with a fuzzy logic controller",
+      "fetched_title": "An experiment in linguistic synthesis with a fuzzy logic controller",
+      "fetched_first_author": "Mamdani",
+      "fetched_year": 1975,
+      "fetched_venue": "International Journal of Man-Machine Studies",
+      "source": "crossref",
+      "doi": "10.1016/s0020-7373(75)80002-2",
+      "url": "https://doi.org/10.1016/s0020-7373(75)80002-2",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "takagi1985",
+      "group": "foundations",
+      "role": "method",
+      "query": {
+        "doi": "10.1109/TSMC.1985.6313399"
+      },
+      "expected_title": "Fuzzy identification of systems and its applications to modeling and control",
+      "fetched_title": "Fuzzy identification of systems and its applications to modeling and control",
+      "fetched_first_author": "Takagi",
+      "fetched_year": 1985,
+      "fetched_venue": "IEEE Transactions on Systems, Man, and Cybernetics",
+      "source": "crossref",
+      "doi": "10.1109/tsmc.1985.6313399",
+      "url": "https://doi.org/10.1109/tsmc.1985.6313399",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "jang1993",
+      "group": "foundations",
+      "role": "method",
+      "query": {
+        "doi": "10.1109/21.256541"
+      },
+      "expected_title": "ANFIS: adaptive-network-based fuzzy inference system",
+      "fetched_title": "ANFIS: adaptive-network-based fuzzy inference system",
+      "fetched_first_author": "Jang",
+      "fetched_year": 1993,
+      "fetched_venue": "IEEE Transactions on Systems, Man, and Cybernetics",
+      "source": "crossref",
+      "doi": "10.1109/21.256541",
+      "url": "https://doi.org/10.1109/21.256541",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "deb2002",
+      "group": "foundations",
+      "role": "method",
+      "query": {
+        "doi": "10.1109/4235.996017"
+      },
+      "expected_title": "A fast and elitist multiobjective genetic algorithm: NSGA-II",
+      "fetched_title": "A fast and elitist multiobjective genetic algorithm: NSGA-II",
+      "fetched_first_author": "Deb",
+      "fetched_year": 2002,
+      "fetched_venue": "IEEE Transactions on Evolutionary Computation",
+      "source": "crossref",
+      "doi": "10.1109/4235.996017",
+      "url": "https://doi.org/10.1109/4235.996017",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "zitzler1999",
+      "group": "foundations",
+      "role": "method",
+      "query": {
+        "doi": "10.1109/4235.797969"
+      },
+      "expected_title": "Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach",
+      "fetched_title": "Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach",
+      "fetched_first_author": "Zitzler",
+      "fetched_year": 1999,
+      "fetched_venue": "IEEE Transactions on Evolutionary Computation",
+      "source": "crossref",
+      "doi": "10.1109/4235.797969",
+      "url": "https://doi.org/10.1109/4235.797969",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "blank2020",
+      "group": "software",
+      "role": "software",
+      "query": {
+        "doi": "10.1109/ACCESS.2020.2990567"
+      },
+      "expected_title": "Pymoo: Multi-Objective Optimization in Python",
+      "fetched_title": "Pymoo: Multi-Objective Optimization in Python",
+      "fetched_first_author": "Blank",
+      "fetched_year": 2020,
+      "fetched_venue": "IEEE Access",
+      "source": "crossref",
+      "doi": "10.1109/access.2020.2990567",
+      "url": "https://doi.org/10.1109/access.2020.2990567",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "ishibuchi1997",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/S0165-0114(96)00098-X"
+      },
+      "expected_title": "Single-objective and two-objective genetic algorithms for selecting linguistic rules for pattern classification problems",
+      "fetched_title": "Single-objective and two-objective genetic algorithms for selecting linguistic rules for pattern classification problems",
+      "fetched_first_author": "Ishibuchi",
+      "fetched_year": 1997,
+      "fetched_venue": "Fuzzy Sets and Systems",
+      "source": "crossref",
+      "doi": "10.1016/s0165-0114(96)00098-x",
+      "url": "https://doi.org/10.1016/s0165-0114(96)00098-x",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "ishibuchi2007",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.ijar.2006.01.004"
+      },
+      "expected_title": "Analysis of interpretability-accuracy tradeoff of fuzzy systems by multiobjective fuzzy genetics-based machine learning",
+      "fetched_title": "Analysis of interpretability-accuracy tradeoff of fuzzy systems by multiobjective fuzzy genetics-based machine learning",
+      "fetched_first_author": "Ishibuchi",
+      "fetched_year": 2007,
+      "fetched_venue": "International Journal of Approximate Reasoning",
+      "source": "crossref",
+      "doi": "10.1016/j.ijar.2006.01.004",
+      "url": "https://doi.org/10.1016/j.ijar.2006.01.004",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "herrera2008",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1007/s12065-007-0001-5"
+      },
+      "expected_title": "Genetic fuzzy systems: taxonomy, current research trends and prospects",
+      "fetched_title": "Genetic fuzzy systems: taxonomy, current research trends and prospects",
+      "fetched_first_author": "Herrera",
+      "fetched_year": 2008,
+      "fetched_venue": "Evolutionary Intelligence",
+      "source": "crossref",
+      "doi": "10.1007/s12065-007-0001-5",
+      "url": "https://doi.org/10.1007/s12065-007-0001-5",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "alcala2009",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1109/TFUZZ.2009.2023113"
+      },
+      "expected_title": "A multiobjective evolutionary approach to concurrently learn rule and data bases of linguistic fuzzy-rule-based systems",
+      "fetched_title": "A Multiobjective Evolutionary Approach to Concurrently Learn Rule and Data Bases of Linguistic Fuzzy-Rule-Based Systems",
+      "fetched_first_author": "Alcala",
+      "fetched_year": 2009,
+      "fetched_venue": "IEEE Transactions on Fuzzy Systems",
+      "source": "crossref",
+      "doi": "10.1109/tfuzz.2009.2023113",
+      "url": "https://doi.org/10.1109/tfuzz.2009.2023113",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "gacto2011",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.ins.2011.02.021"
+      },
+      "expected_title": "Interpretability of linguistic fuzzy rule-based systems: An overview of interpretability measures",
+      "fetched_title": "Interpretability of linguistic fuzzy rule-based systems: An overview of interpretability measures",
+      "fetched_first_author": "Gacto",
+      "fetched_year": 2011,
+      "fetched_venue": "Information Sciences",
+      "source": "crossref",
+      "doi": "10.1016/j.ins.2011.02.021",
+      "url": "https://doi.org/10.1016/j.ins.2011.02.021",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "antonelli2011",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1007/s00500-010-0665-0"
+      },
+      "expected_title": "Learning knowledge bases of multi-objective evolutionary fuzzy systems by simultaneously optimizing accuracy, complexity and partition integrity",
+      "fetched_title": "Learning knowledge bases of multi-objective evolutionary fuzzy systems by simultaneously optimizing accuracy, complexity and partition integrity",
+      "fetched_first_author": "Antonelli",
+      "fetched_year": 2011,
+      "fetched_venue": "Soft Computing",
+      "source": "crossref",
+      "doi": "10.1007/s00500-010-0665-0",
+      "url": "https://doi.org/10.1007/s00500-010-0665-0",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "fazzolari2013",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1109/TFUZZ.2012.2201338"
+      },
+      "expected_title": "A review of the application of multiobjective evolutionary fuzzy systems: current status and further directions",
+      "fetched_title": "A Review of the Application of Multiobjective Evolutionary Fuzzy Systems: Current Status and Further Directions",
+      "fetched_first_author": "Fazzolari",
+      "fetched_year": 2013,
+      "fetched_venue": "IEEE Transactions on Fuzzy Systems",
+      "source": "crossref",
+      "doi": "10.1109/tfuzz.2012.2201338",
+      "url": "https://doi.org/10.1109/tfuzz.2012.2201338",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "fernandez2019",
+      "group": "gfs_moefs",
+      "role": "core",
+      "query": {
+        "doi": "10.1109/MCI.2018.2881645"
+      },
+      "expected_title": "Evolutionary fuzzy systems for explainable artificial intelligence: why, when, what for, and where to?",
+      "fetched_title": "Evolutionary Fuzzy Systems for Explainable Artificial Intelligence: Why, When, What for, and Where to?",
+      "fetched_first_author": "Fernandez",
+      "fetched_year": 2019,
+      "fetched_venue": "IEEE Computational Intelligence Magazine",
+      "source": "crossref",
+      "doi": "10.1109/mci.2018.2881645",
+      "url": "https://doi.org/10.1109/mci.2018.2881645",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "penareyes1999",
+      "group": "medical_fuzzy",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/S0933-3657(99)00019-6"
+      },
+      "expected_title": "A fuzzy-genetic approach to breast cancer diagnosis",
+      "fetched_title": "A fuzzy-genetic approach to breast cancer diagnosis",
+      "fetched_first_author": "Peña-Reyes",
+      "fetched_year": 1999,
+      "fetched_venue": "Artificial Intelligence in Medicine",
+      "source": "crossref",
+      "doi": "10.1016/s0933-3657(99)00019-6",
+      "url": "https://doi.org/10.1016/s0933-3657(99)00019-6",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "nauck1999",
+      "group": "medical_fuzzy",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/S0933-3657(98)00070-0"
+      },
+      "expected_title": "Obtaining interpretable fuzzy classification rules from medical data",
+      "fetched_title": "Obtaining interpretable fuzzy classification rules from medical data",
+      "fetched_first_author": "Nauck",
+      "fetched_year": 1999,
+      "fetched_venue": "Artificial Intelligence in Medicine",
+      "source": "crossref",
+      "doi": "10.1016/s0933-3657(98)00070-0",
+      "url": "https://doi.org/10.1016/s0933-3657(98)00070-0",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "kahramanli2008",
+      "group": "medical_fuzzy",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.eswa.2007.06.004"
+      },
+      "expected_title": "Design of a hybrid system for the diabetes and heart diseases",
+      "fetched_title": "Design of a hybrid system for the diabetes and heart diseases",
+      "fetched_first_author": "KAHRAMANLI",
+      "fetched_year": 2008,
+      "fetched_venue": "Expert Systems with Applications",
+      "source": "crossref",
+      "doi": "10.1016/j.eswa.2007.06.004",
+      "url": "https://doi.org/10.1016/j.eswa.2007.06.004",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "anooj2012",
+      "group": "medical_fuzzy",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.jksuci.2011.09.002"
+      },
+      "expected_title": "Clinical decision support system: Risk level prediction of heart disease using weighted fuzzy rules",
+      "fetched_title": "Clinical decision support system: Risk level prediction of heart disease using weighted fuzzy rules",
+      "fetched_first_author": "Anooj",
+      "fetched_year": 2012,
+      "fetched_venue": "Journal of King Saud University - Computer and Information Sciences",
+      "source": "crossref",
+      "doi": "10.1016/j.jksuci.2011.09.002",
+      "url": "https://doi.org/10.1016/j.jksuci.2011.09.002",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "seera2014",
+      "group": "medical_fuzzy",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.eswa.2013.09.022"
+      },
+      "expected_title": "A hybrid intelligent system for medical data classification",
+      "fetched_title": "A hybrid intelligent system for medical data classification",
+      "fetched_first_author": "Seera",
+      "fetched_year": 2014,
+      "fetched_venue": "Expert Systems with Applications",
+      "source": "crossref",
+      "doi": "10.1016/j.eswa.2013.09.022",
+      "url": "https://doi.org/10.1016/j.eswa.2013.09.022",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "gorzalczany2017",
+      "group": "medical_fuzzy",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.eswa.2016.11.017"
+      },
+      "expected_title": "Interpretable and accurate medical data classification - a multi-objective genetic-fuzzy optimization approach",
+      "fetched_title": "Interpretable and accurate medical data classification – a multi-objective genetic-fuzzy optimization approach",
+      "fetched_first_author": "Gorzałczany",
+      "fetched_year": 2017,
+      "fetched_venue": "Expert Systems with Applications",
+      "source": "crossref",
+      "doi": "10.1016/j.eswa.2016.11.017",
+      "url": "https://doi.org/10.1016/j.eswa.2016.11.017",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "pota2017",
+      "group": "medical_fuzzy",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.knosys.2017.03.006"
+      },
+      "expected_title": "Designing rule-based fuzzy systems for classification in medicine",
+      "fetched_title": "Designing rule-based fuzzy systems for classification in medicine",
+      "fetched_first_author": "Pota",
+      "fetched_year": 2017,
+      "fetched_venue": "Knowledge-Based Systems",
+      "source": "crossref",
+      "doi": "10.1016/j.knosys.2017.03.006",
+      "url": "https://doi.org/10.1016/j.knosys.2017.03.006",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "brier1950",
+      "group": "calibration",
+      "role": "core",
+      "query": {
+        "doi": "10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2"
+      },
+      "expected_title": "Verification of forecasts expressed in terms of probability",
+      "fetched_title": "VERIFICATION OF FORECASTS EXPRESSED IN TERMS OF PROBABILITY",
+      "fetched_first_author": "BRIER",
+      "fetched_year": 1950,
+      "fetched_venue": "Monthly Weather Review",
+      "source": "crossref",
+      "doi": "10.1175/1520-0493(1950)078<0001:vofeit>2.0.co;2",
+      "url": "https://doi.org/10.1175/1520-0493(1950)078<0001:vofeit>2.0.co;2",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "zadrozny2002",
+      "group": "calibration",
+      "role": "core",
+      "query": {
+        "doi": "10.1145/775047.775151"
+      },
+      "expected_title": "Transforming classifier scores into accurate multiclass probability estimates",
+      "fetched_title": "Transforming classifier scores into accurate multiclass probability estimates",
+      "fetched_first_author": "Zadrozny",
+      "fetched_year": 2002,
+      "fetched_venue": "Proceedings of the eighth ACM SIGKDD international conference on Knowledge discovery and data mining",
+      "source": "crossref",
+      "doi": "10.1145/775047.775151",
+      "url": "https://doi.org/10.1145/775047.775151",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "niculescu2005",
+      "group": "calibration",
+      "role": "core",
+      "query": {
+        "doi": "10.1145/1102351.1102430"
+      },
+      "expected_title": "Predicting good probabilities with supervised learning",
+      "fetched_title": "Predicting good probabilities with supervised learning",
+      "fetched_first_author": "Niculescu-Mizil",
+      "fetched_year": 2005,
+      "fetched_venue": "Proceedings of the 22nd international conference on Machine learning  - ICML '05",
+      "source": "crossref",
+      "doi": "10.1145/1102351.1102430",
+      "url": "https://doi.org/10.1145/1102351.1102430",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "gneiting2007",
+      "group": "calibration",
+      "role": "core",
+      "query": {
+        "doi": "10.1198/016214506000001437"
+      },
+      "expected_title": "Strictly proper scoring rules, prediction, and estimation",
+      "fetched_title": "Strictly Proper Scoring Rules, Prediction, and Estimation",
+      "fetched_first_author": "Gneiting",
+      "fetched_year": 2007,
+      "fetched_venue": "Journal of the American Statistical Association",
+      "source": "crossref",
+      "doi": "10.1198/016214506000001437",
+      "url": "https://doi.org/10.1198/016214506000001437",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "naeini2015",
+      "group": "calibration",
+      "role": "core",
+      "query": {
+        "doi": "10.1609/aaai.v29i1.9602"
+      },
+      "expected_title": "Obtaining well calibrated probabilities using Bayesian binning",
+      "fetched_title": "Obtaining Well Calibrated Probabilities Using Bayesian Binning",
+      "fetched_first_author": "Pakdaman Naeini",
+      "fetched_year": 2015,
+      "fetched_venue": "Proceedings of the AAAI Conference on Artificial Intelligence",
+      "source": "crossref",
+      "doi": "10.1609/aaai.v29i1.9602",
+      "url": "https://doi.org/10.1609/aaai.v29i1.9602",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "guo2017",
+      "group": "calibration",
+      "role": "core",
+      "query": {
+        "arxiv": "1706.04599"
+      },
+      "expected_title": "On calibration of modern neural networks",
+      "fetched_title": "On Calibration of Modern Neural Networks",
+      "fetched_first_author": "Guo",
+      "fetched_year": 2017,
+      "fetched_venue": null,
+      "source": "arxiv",
+      "doi": null,
+      "url": "https://arxiv.org/abs/1706.04599",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "nixon2019",
+      "group": "calibration",
+      "role": "core",
+      "query": {
+        "arxiv": "1904.01685"
+      },
+      "expected_title": "Measuring calibration in deep learning",
+      "fetched_title": "Measuring Calibration in Deep Learning",
+      "fetched_first_author": "Nixon",
+      "fetched_year": 2019,
+      "fetched_venue": null,
+      "source": "arxiv",
+      "doi": null,
+      "url": "https://arxiv.org/abs/1904.01685",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "steyerberg2010",
+      "group": "clinical_prediction",
+      "role": "core",
+      "query": {
+        "doi": "10.1097/EDE.0b013e3181c30fb2"
+      },
+      "expected_title": "Assessing the performance of prediction models: a framework for traditional and novel measures",
+      "fetched_title": "Assessing the Performance of Prediction Models: A Framework for Traditional and Novel Measures",
+      "fetched_first_author": "Steyerberg",
+      "fetched_year": 2010,
+      "fetched_venue": "Epidemiology",
+      "source": "crossref",
+      "doi": "10.1097/ede.0b013e3181c30fb2",
+      "url": "https://doi.org/10.1097/ede.0b013e3181c30fb2",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "vancalster2016",
+      "group": "clinical_prediction",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.jclinepi.2015.12.005"
+      },
+      "expected_title": "A calibration hierarchy for risk models was defined: from utopia to empirical data",
+      "fetched_title": "A calibration hierarchy for risk models was defined: from utopia to empirical data",
+      "fetched_first_author": "Van Calster",
+      "fetched_year": 2016,
+      "fetched_venue": "Journal of Clinical Epidemiology",
+      "source": "crossref",
+      "doi": "10.1016/j.jclinepi.2015.12.005",
+      "url": "https://doi.org/10.1016/j.jclinepi.2015.12.005",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "vancalster2019",
+      "group": "clinical_prediction",
+      "role": "core",
+      "query": {
+        "doi": "10.1186/s12916-019-1466-7"
+      },
+      "expected_title": "Calibration: the Achilles heel of predictive analytics",
+      "fetched_title": "Calibration: the Achilles heel of predictive analytics",
+      "fetched_first_author": "Van Calster",
+      "fetched_year": 2019,
+      "fetched_venue": "BMC Medicine",
+      "source": "crossref",
+      "doi": "10.1186/s12916-019-1466-7",
+      "url": "https://doi.org/10.1186/s12916-019-1466-7",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "huang2020",
+      "group": "clinical_prediction",
+      "role": "core",
+      "query": {
+        "doi": "10.1093/jamia/ocz228"
+      },
+      "expected_title": "A tutorial on calibration measurements and calibration models for clinical prediction models",
+      "fetched_title": "A tutorial on calibration measurements and calibration models for clinical prediction models",
+      "fetched_first_author": "Huang",
+      "fetched_year": 2020,
+      "fetched_venue": "Journal of the American Medical Informatics Association",
+      "source": "crossref",
+      "doi": "10.1093/jamia/ocz228",
+      "url": "https://doi.org/10.1093/jamia/ocz228",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "collins2015",
+      "group": "clinical_prediction",
+      "role": "core",
+      "query": {
+        "doi": "10.1136/bmj.g7594"
+      },
+      "expected_title": "Transparent reporting of a multivariable prediction model for individual prognosis or diagnosis (TRIPOD): the TRIPOD statement",
+      "fetched_title": "Transparent reporting of a multivariable prediction model for individual prognosis or diagnosis (TRIPOD): the TRIPOD statement",
+      "fetched_first_author": "Collins",
+      "fetched_year": 2015,
+      "fetched_venue": "BMJ",
+      "source": "crossref",
+      "doi": "10.1136/bmj.g7594",
+      "url": "https://doi.org/10.1136/bmj.g7594",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "christodoulou2019",
+      "group": "clinical_prediction",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.jclinepi.2019.02.004"
+      },
+      "expected_title": "A systematic review shows no performance benefit of machine learning over logistic regression for clinical prediction models",
+      "fetched_title": "A systematic review shows no performance benefit of machine learning over logistic regression for clinical prediction models",
+      "fetched_first_author": "Christodoulou",
+      "fetched_year": 2019,
+      "fetched_venue": "Journal of Clinical Epidemiology",
+      "source": "crossref",
+      "doi": "10.1016/j.jclinepi.2019.02.004",
+      "url": "https://doi.org/10.1016/j.jclinepi.2019.02.004",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "rudin2019",
+      "group": "interpretable_tabular",
+      "role": "core",
+      "query": {
+        "doi": "10.1038/s42256-019-0048-x"
+      },
+      "expected_title": "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead",
+      "fetched_title": "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead",
+      "fetched_first_author": "Rudin",
+      "fetched_year": 2019,
+      "fetched_venue": "Nature Machine Intelligence",
+      "source": "crossref",
+      "doi": "10.1038/s42256-019-0048-x",
+      "url": "https://doi.org/10.1038/s42256-019-0048-x",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "ustun2016",
+      "group": "interpretable_tabular",
+      "role": "core",
+      "query": {
+        "doi": "10.1007/s10994-015-5528-6"
+      },
+      "expected_title": "Supersparse linear integer models for optimized medical scoring systems",
+      "fetched_title": "Supersparse linear integer models for optimized medical scoring systems",
+      "fetched_first_author": "Ustun",
+      "fetched_year": 2016,
+      "fetched_venue": "Machine Learning",
+      "source": "crossref",
+      "doi": "10.1007/s10994-015-5528-6",
+      "url": "https://doi.org/10.1007/s10994-015-5528-6",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "grinsztajn2022",
+      "group": "interpretable_tabular",
+      "role": "core",
+      "query": {
+        "arxiv": "2207.08815"
+      },
+      "expected_title": "Why do tree-based models still outperform deep learning on tabular data?",
+      "fetched_title": "Why do tree-based models still outperform deep learning on tabular data?",
+      "fetched_first_author": "Grinsztajn",
+      "fetched_year": 2022,
+      "fetched_venue": null,
+      "source": "arxiv",
+      "doi": null,
+      "url": "https://arxiv.org/abs/2207.08815",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "shwartzziv2022",
+      "group": "interpretable_tabular",
+      "role": "core",
+      "query": {
+        "doi": "10.1016/j.inffus.2021.11.011"
+      },
+      "expected_title": "Tabular data: Deep learning is not all you need",
+      "fetched_title": "Tabular data: Deep learning is not all you need",
+      "fetched_first_author": "Shwartz-Ziv",
+      "fetched_year": 2022,
+      "fetched_venue": "Information Fusion",
+      "source": "crossref",
+      "doi": "10.1016/j.inffus.2021.11.011",
+      "url": "https://doi.org/10.1016/j.inffus.2021.11.011",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "chen2016",
+      "group": "software",
+      "role": "software",
+      "query": {
+        "doi": "10.1145/2939672.2939785"
+      },
+      "expected_title": "XGBoost: A scalable tree boosting system",
+      "fetched_title": "XGBoost: A Scalable Tree Boosting System",
+      "fetched_first_author": "Chen",
+      "fetched_year": 2016,
+      "fetched_venue": "Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining",
+      "source": "crossref",
+      "doi": "10.1145/2939672.2939785",
+      "url": "https://doi.org/10.1145/2939672.2939785",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "ke2017",
+      "group": "software",
+      "role": "software",
+      "query": {
+        "s2_title": "LightGBM: A Highly Efficient Gradient Boosting Decision Tree"
+      },
+      "expected_title": "LightGBM: A highly efficient gradient boosting decision tree",
+      "fetched_title": "LightGBM: A Highly Efficient Gradient Boosting Decision Tree",
+      "fetched_first_author": "Ke",
+      "fetched_year": 2017,
+      "fetched_venue": "Neural Information Processing Systems",
+      "source": "semanticscholar",
+      "doi": null,
+      "url": "https://www.semanticscholar.org/paper/497e4b08279d69513e4d2313a7fd9a55dfb73273",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "prokhorenkova2018",
+      "group": "software",
+      "role": "software",
+      "query": {
+        "arxiv": "1706.09516"
+      },
+      "expected_title": "CatBoost: unbiased boosting with categorical features",
+      "fetched_title": "CatBoost: unbiased boosting with categorical features",
+      "fetched_first_author": "Prokhorenkova",
+      "fetched_year": 2017,
+      "fetched_venue": null,
+      "source": "arxiv",
+      "doi": null,
+      "url": "https://arxiv.org/abs/1706.09516",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "pedregosa2011",
+      "group": "software",
+      "role": "software",
+      "query": {
+        "arxiv": "1201.0490"
+      },
+      "expected_title": "Scikit-learn: Machine learning in Python",
+      "fetched_title": "Scikit-learn: Machine Learning in Python",
+      "fetched_first_author": "Pedregosa",
+      "fetched_year": 2012,
+      "fetched_venue": "Journal of machine learning research",
+      "source": "arxiv",
+      "doi": null,
+      "url": "https://arxiv.org/abs/1201.0490",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "demsar2006",
+      "group": "evaluation",
+      "role": "core",
+      "query": {
+        "s2_title": "Statistical Comparisons of Classifiers over Multiple Data Sets"
+      },
+      "expected_title": "Statistical comparisons of classifiers over multiple data sets",
+      "fetched_title": "Statistical Comparisons of Classifiers over Multiple Data Sets",
+      "fetched_first_author": "Demšar",
+      "fetched_year": 2006,
+      "fetched_venue": "Journal of machine learning research",
+      "source": "semanticscholar",
+      "doi": null,
+      "url": "https://www.semanticscholar.org/paper/7e640729cca5a82c205bf95f346867097446838c",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "benavoli2017",
+      "group": "evaluation",
+      "role": "method",
+      "query": {
+        "arxiv": "1606.04316"
+      },
+      "expected_title": "Time for a change: a tutorial for comparing multiple classifiers through Bayesian analysis",
+      "fetched_title": "Time for a change: a tutorial for comparing multiple classifiers through Bayesian analysis",
+      "fetched_first_author": "Benavoli",
+      "fetched_year": 2016,
+      "fetched_venue": "Journal of machine learning research",
+      "source": "arxiv",
+      "doi": null,
+      "url": "https://arxiv.org/abs/1606.04316",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "cawley2010",
+      "group": "evaluation",
+      "role": "core",
+      "query": {
+        "s2_title": "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation"
+      },
+      "expected_title": "On over-fitting in model selection and subsequent selection bias in performance evaluation",
+      "fetched_title": "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation",
+      "fetched_first_author": "Cawley",
+      "fetched_year": 2010,
+      "fetched_venue": "Journal of machine learning research",
+      "source": "semanticscholar",
+      "doi": "10.5555/1756006.1859921",
+      "url": "https://www.semanticscholar.org/paper/f7d997a640f2b804676cadb8030d8b2c7bd79d85",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "kaufman2012",
+      "group": "evaluation",
+      "role": "core",
+      "query": {
+        "doi": "10.1145/2382577.2382579"
+      },
+      "expected_title": "Leakage in data mining: Formulation, detection, and avoidance",
+      "fetched_title": "Leakage in data mining: Formulation, detection, and avoidance",
+      "fetched_first_author": "Kaufman",
+      "fetched_year": 2012,
+      "fetched_venue": "ACM Transactions on Knowledge Discovery from Data",
+      "source": "crossref",
+      "doi": "10.1145/2382577.2382579",
+      "url": "https://doi.org/10.1145/2382577.2382579",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "saito2015",
+      "group": "evaluation",
+      "role": "method",
+      "query": {
+        "doi": "10.1371/journal.pone.0118432"
+      },
+      "expected_title": "The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets",
+      "fetched_title": "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",
+      "fetched_first_author": "Saito",
+      "fetched_year": 2015,
+      "fetched_venue": "PLOS ONE",
+      "source": "crossref",
+      "doi": "10.1371/journal.pone.0118432",
+      "url": "https://doi.org/10.1371/journal.pone.0118432",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "vanschoren2014",
+      "group": "data",
+      "role": "data",
+      "query": {
+        "doi": "10.1145/2641190.2641198"
+      },
+      "expected_title": "OpenML: networked science in machine learning",
+      "fetched_title": "OpenML: networked science in machine learning",
+      "fetched_first_author": "Vanschoren",
+      "fetched_year": 2014,
+      "fetched_venue": "ACM SIGKDD Explorations Newsletter",
+      "source": "crossref",
+      "doi": "10.1145/2641190.2641198",
+      "url": "https://doi.org/10.1145/2641190.2641198",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    },
+    {
+      "key": "detrano1989",
+      "group": "data",
+      "role": "data",
+      "query": {
+        "doi": "10.1016/0002-9149(89)90524-9"
+      },
+      "expected_title": "International application of a new probability algorithm for the diagnosis of coronary artery disease",
+      "fetched_title": "International application of a new probability algorithm for the diagnosis of coronary artery disease",
+      "fetched_first_author": "Detrano",
+      "fetched_year": 1989,
+      "fetched_venue": "The American Journal of Cardiology",
+      "source": "crossref",
+      "doi": "10.1016/0002-9149(89)90524-9",
+      "url": "https://doi.org/10.1016/0002-9149(89)90524-9",
+      "title_similarity": 1.0,
+      "first_author_match": true,
+      "verified": true
+    }
+  ]
+}

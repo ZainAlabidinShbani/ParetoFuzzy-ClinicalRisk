@@ -1,68 +1,54 @@
 # FuzzyGA-HealthAI
 
-FuzzyGA-HealthAI is an academic research project investigating hybrid fuzzy
-logic and genetic-algorithm methods for health-risk analysis. The repository
-combines exploratory notebooks, MATLAB experiments, data preparation, results,
-and research writing.
+**Pareto-optimal calibrated and interpretable fuzzy risk scoring via
+multi-objective evolutionary optimisation (NSGA-II).**
 
-## Research workflow
+A zero-order Takagi–Sugeno fuzzy *risk score* whose linguistic partitions and
+rule base are evolved by NSGA-II. It optimises three objectives:
+discrimination (1 − AUROC), calibration (Brier score) and interpretability
+(rules + mean antecedents). It is benchmarked under a nested, leakage-free
+protocol against logistic regression, decision trees, XGBoost, LightGBM,
+CatBoost, MLP, single-objective GA-fuzzy models, and post-hoc Platt/isotonic
+calibration.
 
-1. Explore and clean the health dataset.
-2. Encode clinical features for fuzzy and statistical models.
-3. Establish a fuzzy-logic baseline.
-4. Optimize membership functions or parameters with a genetic algorithm.
-5. Compare the optimized system with a neural-network baseline.
-6. Export metrics and visualizations for analysis and reporting.
+> Research software. Not a medical device; must not be used for diagnosis or
+> treatment decisions.
 
-The project is experimental and must not be used for medical diagnosis or
-individual treatment decisions.
-
-## Repository structure
+## Layout
 
 ```text
-FuzzyGA-HealthAI/
-├── code/
-│   ├── matlab/             # MATLAB fuzzy and optimization experiments
-│   └── python/             # Python data and modeling code, when present
-├── data/
-│   ├── raw/                # Source datasets; keep unmodified
-│   └── processed/          # Derived, analysis-ready data
-├── notebooks/              # Exploration, training, and visualization
-├── results/                # Generated metrics and figures
-├── scripts/                # Reproducibility and utility scripts
-├── docs/                   # Research notes and paper sources
-├── requirements.txt        # Python dependencies (currently project-managed)
-└── README.md
+src/fuzzyrisk/   Python package: data, preprocessing, FIS, encoding, NSGA-II/GA, baselines, metrics, evaluation
+scripts/         Entry points (fetch_data.py, run_pilot.py)
+tests/           pytest suite (leakage, probabilities, determinism, Pareto validity, interpretability)
+tools/           verify_references.py (+ reference_candidates.json)
+paper/           elsarticle manuscript, references.bib (auto-generated, verified), literature_review.md
+results/         references_verification.json, pilot outputs
+legacy/          archived MATLAB scripts, notebooks and derived data (superseded; see legacy/README.md)
+RESEARCH_PLAN.md formulation, encoding, operators, protocol, datasets
+PROGRESS.md      phase log and pilot results
 ```
 
-## Notebook sequence
+## Setup (Windows 11, Python 3.11)
 
-See [`notebooks/README.md`](./notebooks/README.md) for the intended sequence:
-exploration, feature analysis, model training, and results visualization.
+```powershell
+py -3.11 -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt   # exact lock: requirements-lock.txt
+$env:PYTHONUTF8 = "1"
+```
 
-## Running experiments
+## Usage
 
-The repository currently contains MATLAB source and notebooks but does not
-declare Python dependencies in `requirements.txt`. Before running an
-experiment:
+```powershell
+.venv\Scripts\python scripts\fetch_data.py                # dev datasets only, checksum-verified
+.venv\Scripts\python -m pytest -q                         # unit tests
+.venv\Scripts\python scripts\run_pilot.py --seed 0        # 1-seed pilot on the 2 dev datasets
+.venv\Scripts\python tools\verify_references.py           # re-verify citations against Crossref/arXiv/S2
+cd paper; latexmk -pdf main.tex                           # build manuscript
+```
 
-1. Check the notebook imports and the MATLAB release/toolboxes required by the
-   selected script.
-2. Place source data under `data/raw/` and keep derived data under
-   `data/processed/`.
-3. Run notebooks in order and record dataset versions, preprocessing choices,
-   random seeds, and evaluation splits.
-4. Save generated figures and metrics under `results/`.
+## Data policy
 
-Do not commit private, identifiable, or licensed health data.
-
-## Reporting expectations
-
-When comparing models, report class balance, missing-value handling,
-normalization, train/test separation, random seeds, and metrics such as
-precision, recall, F1, ROC-AUC, and calibration where appropriate.
-
-## Documentation
-
-Research material is maintained in [`docs/`](./docs/), while implementation
-details are documented in [`code/README.md`](./code/README.md).
+Datasets are fetched on demand from OpenML/UCI into `data/` (git-ignored) and
+verified against the OpenML md5 and a pinned sha256 of the canonical CSV. The
+four **held-out** datasets cannot be loaded until `PREREGISTRATION.md` is
+locked (see `RESEARCH_PLAN.md` §7).

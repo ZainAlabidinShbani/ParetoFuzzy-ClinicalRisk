@@ -1,0 +1,51 @@
+%% Applied Soft Computing (Elsevier) -- elsarticle template
+%% Build:  pdflatex main && bibtex main && pdflatex main && pdflatex main
+%% (or)    latexmk -pdf main.tex
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\journal{Applied Soft Computing}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Pareto-Optimal Calibrated and Interpretable Fuzzy Risk Scoring via Multi-Objective Evolutionary Optimization}
+
+%% Author metadata intentionally left as placeholders until submission.
+\author[inst1]{Author One}
+\affiliation[inst1]{organization={Affiliation placeholder},
+            country={Country}}
+
+\begin{abstract}
+%% Placeholder -- written after the preregistered held-out evaluation (Phase 5).
+Template build check. No results are reported in this draft.
+\end{abstract}
+
+\begin{keyword}
+Genetic fuzzy systems \sep NSGA-II \sep Probability calibration \sep Interpretability \sep Clinical risk prediction \sep Gradient boosting
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+\label{sec:intro}
+%% Placeholder text exercising the bibliography pipeline only.
+Takagi--Sugeno fuzzy models~\cite{takagi1985} optimised with genetic
+algorithms~\cite{herrera2008} and multi-objective evolutionary
+algorithms such as NSGA-II~\cite{deb2002} trade accuracy for
+interpretability~\cite{ishibuchi2007,fazzolari2013}. Calibration of clinical
+risk models is a separate requirement~\cite{vancalster2019}.
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+\end{document}
