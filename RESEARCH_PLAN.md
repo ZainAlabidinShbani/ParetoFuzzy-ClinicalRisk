@@ -65,10 +65,14 @@ rule-based analogue of point-based clinical scores (`ustun2016`).
 
 Given antecedents and partitions, $z$ is linear in $(w_0, \mathbf w)$, so
 consequents are estimated by **L2-penalised logistic regression** (Newton–Raphson,
-$\lambda = 1$, intercept unpenalised):
+intercept unpenalised):
 $$ \min_{w_0,\mathbf w} \sum_i \ell_{\log}\big(y_i, \sigma(w_0 + \mathbf B_i \mathbf w)\big) + \tfrac{\lambda}{2}\|\mathbf w\|^2 , \quad B_{ir} = \beta_r(x_i). $$
 The GA searches the discrete/continuous structure (antecedents, partitions),
 and a convex solver fits the consequents (cf. hybrid learning in ANFIS, `jang1993`).
+**Refinement (pre-Phase 3):** $\lambda$ is selected *per genome* from
+$\{0.01, 0.1, 1, 10\}$ by minimum pooled inner-OOF log-loss (warm-started
+regularisation path). The deployed model refits its consequents on the whole
+outer-training fold with the $\lambda$ selected for its genome.
 Ablation: `evolved` consequents ($w_r \in [-4, 4]$ as genes), the classic
 GA-fuzzy setting.
 
@@ -99,8 +103,10 @@ fitted on 2/3, predicted on 1/3):
 1. Discrimination: $f_1 = 1 - \mathrm{AUROC}(y, \hat p^{\text{oof}})$
 2. Calibration (proper score): $f_2 = \mathrm{Brier}(y, \hat p^{\text{oof}})$
    (ablations: ECE, log-loss)
-3. Interpretability: $f_3 = R_{\text{act}} + \bar L$, where $R_{\text{act}}$ is the number of
-   distinct active rules and $\bar L$ the mean number of antecedents per rule.
+3. Interpretability: $f_3 =$ **total literals** $= \sum_{r \in \text{active}} |S_r|$, the
+   number of antecedent conditions summed over distinct active rules. Integer
+   valued. **Refinement:** this replaced $R_{\text{act}} + \bar L$ after the pilot
+   showed a saturated front (all 60 individuals non-dominated).
 
 Brier is used as the calibration objective because it is a strictly proper
 scoring rule (`gneiting2007`) and is far less noisy than binned ECE on
@@ -120,16 +126,22 @@ intercept are reported as **outcomes**, not optimised.
   condition (0.25), relabel (0.2), toggle rule (0.2), new random rule (0.15)}.
   Length repair to $L_{\max}$.
 * Survival: standard NSGA-II (non-dominated sorting + crowding distance,
-  `deb2002`); duplicate elimination on.
+  `deb2002`); duplicate elimination on. Population 80, 80 generations
+  (6,400 evaluations). The same budget is used by both single-objective GAs.
+* **External archive:** every non-dominated solution seen in any generation is
+  kept, deduplicated on objective vectors. The archive is the reported front,
+  and its normalised hypervolume is logged per generation.
 
 ### 4.3 Single deployable model: preregistered ε-compact rule
 
-From the final non-dominated set, take every solution whose inner-OOF AUROC is
-within ε = 0.01 of the front's best. Choose the one with the lowest $f_3$,
+From the external archive, take every solution whose inner-OOF AUROC is
+within ε = 0.01 of the archive's best. Choose the one with the lowest $f_3$,
 breaking ties by the lowest inner-OOF Brier. Consequents are then refitted on
 the full outer-training fold. The whole front is also refitted and scored on
 the outer test fold, for Pareto analysis only; those scores are never used
-for selection.
+for selection. **Secondary (ablation) operating point:** the archive member
+with the lowest inner-OOF Brier (ties broken by fewer literals), reported as
+`MO-Fuzzy(best-Brier)` from the same run.
 
 ## 5. Baselines
 
@@ -173,19 +185,21 @@ population size and number of generations.
 Discrimination: AUROC, PR-AUC. Calibration: Brier, log-loss, ECE (10
 equal-width bins), adaptive ECE (10 equal-mass bins, `nixon2019`), calibration
 intercept and slope (logistic recalibration, `vancalster2016`), and
-calibration-in-the-large. Interpretability: distinct active rules, mean and
-total antecedents, $f_3$. Pareto quality: normalised hypervolume with
-objective scales (0.5, 0.25, $R_{\max}+L_{\max}$) and reference point (1,1,1),
+calibration-in-the-large. Interpretability: distinct active rules, mean
+antecedents per rule, and total literals ($f_3$; for the decision tree, the
+sum of leaf depths). Pareto quality: normalised hypervolume with objective
+scales (0.5, 0.25, $R_{\max} L_{\max} = 48$) and reference point (1,1,1),
 `zitzler1999`, on both inner-OOF and outer-test fronts. Cost: fit and predict
 wall-time, peak process working set (RSS).
 
 ### Statistics (Phase 4, preregistered in Phase 3)
 
-Per-dataset mean ± SD over the 25 outer folds; Friedman test plus Nemenyi or
-Holm post-hoc across datasets (`demsar2006`); Bayesian signed-rank with ROPE
-(`benavoli2017`) for MO-Fuzzy vs each baseline. With 6 datasets, power for
-across-dataset tests is low; per-dataset corrected resampled t-tests are
-reported as secondary.
+Superseded by the locked analysis plan in `PREREGISTRATION.md` §6:
+Friedman test + Nemenyi critical-difference diagram + Holm-corrected Wilcoxon
+signed-rank tests (MO-Fuzzy vs each model) across the 6 datasets
+(`demsar2006`), with the low power at N = 6 stated up front. Secondary:
+per-dataset Nadeau–Bengio corrected resampled t-tests over the 25 outer
+folds, Holm-corrected.
 
 ## 7. Datasets and strict dev / held-out separation
 
