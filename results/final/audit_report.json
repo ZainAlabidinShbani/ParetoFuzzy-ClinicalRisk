@@ -1,0 +1,246 @@
+{
+  "all_ok": true,
+  "citations": {
+    "missing_in_bib": [],
+    "n_bib": 53,
+    "n_cited": 53,
+    "n_verified": 53,
+    "ok": true,
+    "uncited_bib_entries": [],
+    "unverified": []
+  },
+  "dev_pins": {
+    "dev_pins_match_prereg": {
+      "heart_cleveland": true,
+      "pima_diabetes": true
+    },
+    "ok": true
+  },
+  "latex_build": {
+    "bibtex_errors": 0,
+    "errors": [],
+    "ok": true,
+    "overfull_hbox_warnings": 3,
+    "pages": 31,
+    "return_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "undefined": []
+  },
+  "post_lock_code_sha256": {
+    "scripts/analyze.py": "cc128d34e4a18ebfc7c73cafa1a74447c5098ec6cafda34be73effec87d21695",
+    "scripts/dataset_info.py": "ba9cc3944f4f0590b5d8a2f79dfea5e62bbd06d72fda8e7c1a9148aa7bad2956",
+    "scripts/figures.py": "8d3e4558b5eb9130c883f5e517b6be917e6845d94e05da3db52af7f6ff78e920",
+    "tools/audit.py": "ca2064d339edd5003baea824ce8236d3d72aafbfb084bc37b1c53bdbbef53fea",
+    "tools/build_submission.py": "5dc17579f33bb0b9abb1640021315ac1819989d9242a7e14b65b943e936c9926",
+    "tools/hash_manifest.py": "69ddb5f9e1817d16119e379f8e050d10fe16f94f36d2b57eb63ddbbd5a87e072",
+    "tools/replicate.py": "790468bbaf24cd23d70146575b9f6f94df21081c8582ae647b9980bd7e7e7a00"
+  },
+  "prereg_hashes": {
+    "deviations_applied": [
+      "src/fuzzyrisk/data.py",
+      "src/fuzzyrisk/metrics.py",
+      "tests/test_metrics_data.py",
+      "tests/test_solver_regression.py"
+    ],
+    "mismatched": {},
+    "missing": [],
+    "n_files": 23,
+    "ok": true
+  },
+  "pytest": {
+    "ok": true,
+    "summary": "66 passed, 1 skipped in 23.20s"
+  },
+  "regeneration": {
+    "differences": [],
+    "n_compared": 17,
+    "ok": true
+  },
+  "replication": {
+    "fits": [
+      {
+        "checkpoint": "s1__heart_cleveland__f0__LogReg",
+        "git_commit": "0d46cfe07b",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s1__heart_cleveland__f0__DecisionTree",
+        "git_commit": "0d46cfe07b",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s1__heart_cleveland__f0__XGBoost",
+        "git_commit": "0d46cfe07b",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s0__heart_cleveland__f0__LogReg",
+        "git_commit": "872cdad7ec",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s0__heart_cleveland__f0__DecisionTree",
+        "git_commit": "872cdad7ec",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s0__heart_cleveland__f0__XGBoost",
+        "git_commit": "872cdad7ec",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s0__heart_cleveland__f4__LogReg",
+        "git_commit": "872cdad7ec",
+        "git_dirty": true,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s0__heart_cleveland__f4__DecisionTree",
+        "git_commit": "872cdad7ec",
+        "git_dirty": true,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s0__heart_cleveland__f4__XGBoost",
+        "git_commit": "872cdad7ec",
+        "git_dirty": true,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s3__heart_cleveland__f0__LogReg",
+        "git_commit": "cc126e3825",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s3__heart_cleveland__f0__DecisionTree",
+        "git_commit": "cc126e3825",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s3__heart_cleveland__f0__XGBoost",
+        "git_commit": "cc126e3825",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s1__heart_cleveland__f0__MO-Fuzzy-NSGA-II",
+        "git_commit": "cc126e3825",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      },
+      {
+        "checkpoint": "s0__heart_cleveland__f0__MO-Fuzzy-NSGA-II",
+        "git_commit": "f98b39e737",
+        "git_dirty": false,
+        "max_abs_dp": 0.0,
+        "metric_mismatches": {},
+        "ok": true,
+        "same_rows": true
+      }
+    ],
+    "groups_covered": [
+      "0d46cfe07b",
+      "872cdad7ec",
+      "872cdad7ec+dirty",
+      "cc126e3825",
+      "f98b39e737"
+    ],
+    "n_replicated": 14,
+    "ok": true
+  },
+  "results_complete": {
+    "expected": 1650,
+    "git_commits": [
+      "0d46cfe07b4ccd859fa22583a3261890c21814e6",
+      "872cdad7ecd1a99288fa3b8b9251423171dfafc9",
+      "cc126e38256ee540f1650fc933d9c0e8c442ae31",
+      "f98b39e737d33fb10ae3af2094e31e58c5a3fd70"
+    ],
+    "n_fits": 1650,
+    "ok": true
+  },
+  "run_provenance": {
+    "commits": {
+      "0d46cfe07b": {
+        "any_dirty_checkpoint": false,
+        "locked_files": 22,
+        "locked_files_changed_in_next_commit": [],
+        "mismatched": [],
+        "next_commit": null
+      },
+      "872cdad7ec": {
+        "any_dirty_checkpoint": true,
+        "locked_files": 22,
+        "locked_files_changed_in_next_commit": [],
+        "mismatched": [],
+        "next_commit": "b45bbd0367"
+      },
+      "cc126e3825": {
+        "any_dirty_checkpoint": false,
+        "locked_files": 23,
+        "locked_files_changed_in_next_commit": [],
+        "mismatched": [],
+        "next_commit": null
+      },
+      "f98b39e737": {
+        "any_dirty_checkpoint": false,
+        "locked_files": 23,
+        "locked_files_changed_in_next_commit": [],
+        "mismatched": [],
+        "next_commit": null
+      }
+    },
+    "ok": true
+  }
+}
