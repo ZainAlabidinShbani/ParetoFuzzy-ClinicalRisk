@@ -184,6 +184,37 @@ def tex_escape(s: str) -> str:
     return s
 
 
+# combining mark (NFD) -> LaTeX accent command letter
+_ACCENTS = {"\u0301": "'", "\u0300": "`", "\u0302": "^", "\u0308": '"', "\u0303": "~", "\u0304": "=",
+            "\u0307": ".", "\u0327": "c", "\u030c": "v", "\u030a": "r", "\u0306": "u", "\u030b": "H",
+            "\u0328": "k"}
+_SPECIAL = {"\u0142": r"{\l}", "\u0141": r"{\L}", "\u00f8": r"{\o}", "\u00d8": r"{\O}", "\u00df": r"{\ss}",
+            "\u00e6": r"{\ae}", "\u00c6": r"{\AE}", "\u0131": r"{\i}",
+            "\u2018": "`", "\u2019": "'", "\u201c": "``", "\u201d": "''", "\u2013": "--", "\u2014": "---"}
+BS = "\\"
+
+
+def name_tex(s: str) -> str:
+    """Names to ASCII LaTeX. BibTeX abbreviates first names byte-wise, so a UTF-8 initial (e.g. an
+    E with acute accent) would be cut in half; accented letters become BibTeX special characters
+    such as {\'E}, which BibTeX abbreviates correctly."""
+    out = []
+    for ch in tex_escape(s):
+        if ord(ch) < 128:
+            out.append(ch)
+        elif ch in _SPECIAL:
+            out.append(_SPECIAL[ch])
+        else:
+            d = unicodedata.normalize("NFD", ch)
+            base, marks = d[0], d[1:]
+            if len(marks) == 1 and marks in _ACCENTS and ord(base) < 128:
+                a = _ACCENTS[marks]
+                out.append("{" + BS + a + base + "}" if a in "'`^\"~=." else "{" + BS + a + "{" + base + "}}")
+            else:
+                raise ValueError(f"no LaTeX mapping for {ch!r} in name {s!r}")
+    return "".join(out)
+
+
 def to_bibtex(key: str, rec: dict) -> str:
     t = rec.get("type")
     container = rec.get("container") or ""
@@ -205,8 +236,8 @@ def to_bibtex(key: str, rec: dict) -> str:
     else:
         etype, cfield = "misc", "howpublished"
     authors = " and ".join(
-        (f"{tex_escape(a['family'])}, {tex_escape(a['given'])}" if a.get("given")
-         else "{" + tex_escape(a["family"]) + "}")  # group/consortium author: keep verbatim
+        (f"{name_tex(a['family'])}, {name_tex(a['given'])}" if a.get("given")
+         else "{" + name_tex(a["family"]) + "}")  # group/consortium author: keep verbatim
         for a in rec["authors"]
     ) or "Anonymous"
     fields = [("author", authors), ("title", "{" + tex_escape(rec["title"]) + "}"), ("year", str(rec["year"]))]
