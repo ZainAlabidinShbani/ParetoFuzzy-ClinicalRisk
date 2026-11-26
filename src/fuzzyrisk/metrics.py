@@ -60,11 +60,17 @@ def ece(y, p, n_bins: int = 10, strategy: str = "uniform") -> float:
 
 def fit_logistic_l2(A, y, lam: float = 1.0, penalize_intercept: bool = False,
                     max_iter: int = 50, tol: float = 1e-8, w0=None):
-    """Newton-Raphson for L2-penalised logistic regression.
+    """Damped Newton-Raphson for L2-penalised logistic regression.
 
-    Minimises  sum_i logloss(y_i, sigmoid(b + A_i w)) + lam/2 ||w||^2.
+    Minimises  J = sum_i logloss(y_i, sigmoid(b + A_i w)) + lam/2 ||w||^2.
     Returns (b, w). Deterministic; used both for TSK consequent estimation and
     for logistic recalibration (calibration slope/intercept).
+
+    Deviation D3: each Newton step is accepted only if it does not increase J (exact,
+    unclipped objective); otherwise it is halved (backtracking, up to 40 halvings).
+    Plain Newton is not globally convergent: on near-saturated logits the clipped
+    Hessian is near-singular and the iterates diverged (Thyroid). When every full
+    step decreases J the iterates are bit-identical to plain Newton.
     """
     A = np.asarray(A, float)
     y = np.asarray(y, float)
@@ -79,6 +85,12 @@ def fit_logistic_l2(A, y, lam: float = 1.0, penalize_intercept: bool = False,
     else:
         pbar = np.clip(y.mean(), 1e-6, 1 - 1e-6)
         theta[0] = np.log(pbar / (1 - pbar))
+
+    def objective(t):
+        z = Z @ t
+        return float(np.sum(np.logaddexp(0.0, z) - y * z) + 0.5 * np.sum(pen * t * t))
+
+    J = objective(theta)
     for _ in range(max_iter):
         z = np.clip(Z @ theta, -35, 35)
         p = 1.0 / (1.0 + np.exp(-z))
@@ -89,7 +101,16 @@ def fit_logistic_l2(A, y, lam: float = 1.0, penalize_intercept: bool = False,
             step = np.linalg.solve(H, g)
         except np.linalg.LinAlgError:
             step = np.linalg.lstsq(H, g, rcond=None)[0]
-        theta -= step
+        slack = 1e-12 * max(1.0, abs(J))  # rounding noise near the optimum must not trigger halving
+        for _halve in range(41):
+            cand = theta - step
+            Jc = objective(cand)
+            if np.isfinite(Jc) and Jc <= J + slack:
+                break
+            step = 0.5 * step
+        else:  # no decrease along the Newton direction: converged to numerical precision
+            break
+        theta, J = cand, Jc
         if np.max(np.abs(step)) < tol:
             break
     return float(theta[0]), theta[1:].copy()
