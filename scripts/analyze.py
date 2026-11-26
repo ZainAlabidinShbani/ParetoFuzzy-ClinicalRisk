@@ -134,6 +134,35 @@ class Macros:
 
 
 # --------------------------------------------------------------------------- #
+def recompute_metrics(R: pd.DataFrame, res: Path):
+    """Recompute every outcome metric from the stored test-fold predictions with the final metrics code.
+
+    Checkpoints store metrics computed at fit time. Deviation D3 fixed the logistic solver that the
+    calibration slope/intercept use, so all metrics are recomputed here from the primary data (the
+    predictions); the number and size of changes are reported in stats.json.
+    """
+    from fuzzyrisk.metrics import all_metrics
+    P = pd.read_csv(res / "predictions.csv.gz")
+    rows = []
+    for (ds, s, f, m), g in P.groupby(["dataset", "seed", "fold", "model"], sort=True):
+        rows.append({"dataset": ds, "seed": s, "fold": f, "model": m, **all_metrics(g.y.values, g.p.values)})
+    M = pd.DataFrame(rows)
+    keys = ["dataset", "seed", "fold", "model"]
+    cols = [c for c in M.columns if c not in keys]
+    merged = R.merge(M, on=keys, how="left", suffixes=("", "__new"), validate="one_to_one")
+    assert merged[[c + "__new" for c in cols]].notna().any(axis=1).all(), "fit without predictions"
+    report = {}
+    for c in cols:
+        old, new = merged[c].astype(float), merged[c + "__new"].astype(float)
+        both_nan = old.isna() & new.isna()
+        nan_mismatch = old.isna() ^ new.isna()
+        diff = (old - new).abs().where(~(both_nan | nan_mismatch), 0.0)
+        report[c] = {"n_changed_gt_1e-9": int((diff > 1e-9).sum() + nan_mismatch.sum()),
+                     "n_nan_mismatch": int(nan_mismatch.sum()), "max_abs_change": round(float(diff.max()), 9)}
+        merged[c] = new
+    return merged.drop(columns=[c + "__new" for c in cols]), report
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", default=str(ROOT / "results" / "final"))
@@ -154,6 +183,7 @@ def main():
     assert (n_folds_per == n_seeds * 5).all(), "incomplete records"
     J = int(n_folds_per.iloc[0])
     mac = Macros()
+    R, recompute = recompute_metrics(R, res)
 
     # ---------------- per-dataset summaries ----------------
     metrics = ["auroc", "pr_auc", "brier", "log_loss", "ece", "ece_adaptive", "cal_slope", "cal_intercept",
@@ -189,7 +219,8 @@ def main():
     GS.round(6).to_csv(res / "summary_groups.csv", index=False, encoding="utf-8")
 
     # ---------------- across-dataset tests (§6.2) ----------------
-    st = {"n_datasets": len(DATASETS), "k_models": len(MODELS), "folds_per_dataset": J}
+    st = {"n_datasets": len(DATASETS), "k_models": len(MODELS), "folds_per_dataset": J,
+          "metrics_recomputed_from_predictions": recompute}
     for metric in ("auroc", "brier"):
         M = table_matrix(metric)
         rk = ranks_matrix(M, HIGHER_BETTER[metric])
