@@ -22,11 +22,23 @@ Before any held-out file was downloaded, a preregistration was committed and tag
 the code repository. It fixed the datasets, positive classes, method configuration,
 baselines and search budgets, outer protocol, hypotheses H1--H4, the statistical
 analysis plan, and the SHA-256 hashes of all source, script, test and requirement
-files. Two deviations occurred, both of them engineering-only and documented with
-their reasons and new hashes. D1: a parser fallback was needed because the default
-ARFF parser fails under the installed pandas version for integer-like class labels.
-D2: a unit test that asserted the held-out files were absent was conditioned on the
-lock. Neither affects the method, the data or the metrics.
+files. Three deviations occurred. Each is documented in the repository with its reason
+and the new file hashes, and the audit accepts no other change. D1: a parser fallback
+was needed because the default ARFF parser fails under the installed pandas version for
+integer-like class labels. D2: a unit test that asserted the held-out files were absent
+was conditioned on the lock. D3 was found after the first two seeds had completed,
+with held-out results visible. Every deployed hybrid-consequent model on the thyroid
+data (MO-Fuzzy and SO-GA-Fuzzy hybrid, 15 of 15 each) had a diverged intercept and
+constant predictions, although its inner cross-validated objectives were good. The
+cause was the plain Newton iteration for \eqref{eq:consequents}, which is not globally
+convergent. It was replaced by Newton with step-halving on the exact penalised
+objective. This changes the solver, not the estimator: full steps that decrease the
+objective are accepted unchanged, and the fixed solver agrees with scikit-learn's
+logistic regression on the failing case. All MO-Fuzzy and SO-GA-Fuzzy (hybrid) fits
+were then re-run with the fixed code. The superseded fits are archived with the
+results. The same routine computes the calibration slope of every model, so all
+outcome metrics are recomputed from the stored test-fold predictions. No design
+choice, hyperparameter, hypothesis or analysis step was changed.
 
 \subsection{Models}
 Eleven models were compared. Logistic regression (L2) and a depth-limited decision
@@ -78,7 +90,7 @@ metric. Reporting follows TRIPOD~\cite{collins2015} where applicable.
 
 \subsection{Computation}
 All models ran single-threaded (BLAS, OpenMP and model thread pools set to 1) on a
-Windows 11 laptop with 16\,GB RAM, through a checkpointed runner that saves every fit
+Windows~11 laptop (Intel Core~7 240H, 16\,GB RAM), through a checkpointed runner that saves every fit
 atomically and resumes after interruption. The full study (\resNFits{} fits) took
 \resComputeHours{}\,h of fit time, and peak process memory never exceeded
 \resMaxRSS{}\,MB.

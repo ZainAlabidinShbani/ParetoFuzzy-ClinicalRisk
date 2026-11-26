@@ -345,6 +345,20 @@ def main():
         mac.add(macro_name("MO brier", gname), fmt(br.loc[dss, MO].mean()))
         mac.add(macro_name("MO literals", gname), fmt(lit.loc[dss, MO].mean(), 1))
         mac.add(macro_name("hybrid literals", gname), fmt(lit.loc[dss, HYBRID].mean(), 1))
+    for m in MODELS + [ABLATION]:
+        for metric in ("auroc", "brier", "ece"):
+            for gname, dss in (("all", DATASETS), ("heldout", HELDOUT)):
+                v = float(np.mean([mean_of(m, ds, metric) for ds in dss]))
+                mac.add(macro_name("mean", metric, gname, MNAME[m]), fmt(v))
+    for m in (MO, ABLATION, HYBRID, CLASSIC):
+        mac.add(macro_name("mean literals all", MNAME[m]),
+                fmt(float(np.mean([mean_of(m, ds, "complexity") for ds in DATASETS])), 1))
+        mac.add(macro_name("mean rules all", MNAME[m]),
+                fmt(float(np.mean([mean_of(m, ds, "n_rules") for ds in DATASETS])), 1))
+    mac.add("resNSlopeRecomputed", str(recompute["cal_slope"]["n_changed_gt_1e-9"]))
+    for ds in DATASETS:
+        sub = S[(S.dataset == ds) & (S.model == MO)].iloc[0]
+        mac.add(macro_name("MO slope median dev", DNAME[ds]), fmt(float(sub.abs_slope_dev_median), 2))
     fit = R.groupby("model").fit_s.mean()
     for m in (MO, HYBRID, CLASSIC, "CatBoost", "XGBoost", "LogReg"):
         mac.add(macro_name("fit", MNAME[m]), fmt(float(fit[m]), 1))
