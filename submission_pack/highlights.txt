@@ -1,0 +1,5 @@
+- NSGA-II evolves additive fuzzy risk scores for AUROC, Brier score and literals
+- Preregistered leakage-free benchmark: 6 clinical datasets, 11 models, 1,650 fits
+- Scores used 3.9 literals on average vs 21.9 for single-objective GA-fuzzy
+- Lower Brier score than accuracy-driven GA-fuzzy models on 6 of 6 datasets
+- Tuned gradient boosting stays ahead; the gap is largest on near-separable data

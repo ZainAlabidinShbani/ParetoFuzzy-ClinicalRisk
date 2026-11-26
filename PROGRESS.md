@@ -168,3 +168,45 @@ Machine-readable copy: `PREREGISTRATION_DEVIATIONS.json`; verified by `tools/aud
 * **D1** (`src/fuzzyrisk/data.py`, new sha256 `9316f24902656f47…`): At unlock, sklearn 1.9's pandas ARFF parser raised TypeError under pandas 3 on integer-like nominal levels (WDBC Class {1,2}). Added a fallback to sklearn's LIAC-ARFF parser for the same md5-verified file. Parsing only; no change to method, data, splits or metrics. Dev datasets still parse with the pandas parser and match their pinned sha256.
 * **D2** (`tests/test_metrics_data.py`, new sha256 `a7343a97c02b494e…`): test_heldout_not_present_on_disk encodes a pre-unlock invariant that becomes false by design once held-out data are fetched; it now skips when PREREGISTRATION.md is locked.
 * **D3** (`src/fuzzyrisk/metrics.py`, new sha256 `a3c0451779b1af13…`; new test `tests/test_solver_regression.py`, sha256 `3bf4e1bdc6606e47…`), 2026-11-26: while checking the first two complete seeds (held-out results visible), every deployed MO-Fuzzy and SO-GA-Fuzzy(hybrid) model on Thyroid (15/15 each) turned out to have diverged consequents: intercept ≈ −1e12, constant test predictions, AUROC 0.5. Their inner-CV objectives were good. The cause was the plain-Newton penalised-logistic solver: the first step overshoots on imbalanced data with a rule that fires on a small high-risk subgroup, then explodes on saturated logits. The fix adds backtracking (step-halving) on the exact penalised objective. Full steps that do not increase the objective are accepted unchanged, so the estimator is the same and only the solver now converges; it matches sklearn's `LogisticRegression` to 1e-4 on the reproduced Thyroid case. All 300 MO-Fuzzy and SO-GA-Fuzzy(hybrid) fits are re-run with the fixed code. The 174 superseded checkpoints are archived in `results/final/superseded_D3/`, summarised in `results/final/superseded_D3_records.csv`. The same solver computes every model's calibration slope and intercept (old slopes diverged to ~1e12 on 44 Thyroid baseline fits in seeds 0–1), so `scripts/analyze.py` now recomputes all outcome metrics from the stored test-fold predictions and reports the changes in `stats.json`. Design, hyperparameters, data, splits, hypotheses and the analysis plan are unchanged.
+
+## 2026-11-27 — Phase 3 sweep complete; Phases 4–6 (analysis, manuscript, audit, submission pack)
+
+**Sweep.** 1650/1650 preregistered fits (5 seeds × 5 folds × 6 datasets × 11 models) plus the
+best-Brier ablation, all single-threaded via `scripts/run_experiment.py` in checkpointed chunks.
+Peak RSS per fit ≤ 302 MB. All 300 MO-Fuzzy / SO-GA-Fuzzy(hybrid) fits come from post-D3 commits
+(`f98b39e`, `cc126e3`). The last chunks ran in the foreground (`--hard-limit-min 9.3`) after Claude
+Code reaped a background chunk under system memory pressure. No fits were lost (atomic checkpoints).
+
+**Headline results** (mean AUROC / Brier over 25 outer test folds; generated from
+`results/final/summary_by_dataset.csv` and `stats.json`):
+
+| Model | Pima | Cleveland | WDBC | ILPD | Thyroid | CKD | mean |
+|---|---|---|---|---|---|---|---|
+| MO-Fuzzy(NSGA-II) | 0.841 / 0.155 | 0.892 / 0.132 | 0.988 / 0.036 | 0.710 / 0.183 | 0.976 / 0.023 | 0.993 / 0.021 | 0.900 / 0.092 |
+| MO-Fuzzy(best-Brier) | 0.837 / 0.156 | 0.896 / 0.129 | 0.988 / 0.035 | 0.712 / 0.184 | 0.960 / 0.017 | 0.999 / 0.011 | 0.899 / 0.089 |
+| SO-GA-Fuzzy(hybrid) | 0.820 / 0.167 | 0.878 / 0.151 | 0.992 / 0.033 | 0.690 / 0.197 | 0.987 / 0.017 | 0.998 / 0.011 | 0.894 / 0.096 |
+| SO-GA-Fuzzy(classic) | 0.793 / 0.178 | 0.890 / 0.133 | 0.987 / 0.048 | 0.636 / 0.202 | 0.845 / 0.080 | 0.997 / 0.067 | 0.858 / 0.118 |
+| CatBoost | 0.839 / 0.156 | 0.907 / 0.122 | 0.994 / 0.023 | 0.743 / 0.174 | 0.998 / 0.007 | 1.000 / 0.005 | 0.913 / 0.081 |
+| XGBoost | 0.837 / 0.156 | 0.904 / 0.124 | 0.993 / 0.025 | 0.726 / 0.180 | 0.997 / 0.009 | 1.000 / 0.006 | 0.909 / 0.083 |
+| LightGBM | 0.836 / 0.157 | 0.903 / 0.123 | 0.994 / 0.024 | 0.721 / 0.182 | 0.998 / 0.008 | 1.000 / 0.002 | 0.909 / 0.083 |
+| LogReg | 0.834 / 0.158 | 0.912 / 0.115 | 0.996 / 0.020 | 0.751 / 0.172 | 0.953 / 0.027 | 1.000 / 0.005 | 0.907 / 0.083 |
+| XGBoost+Platt | 0.839 / 0.156 | 0.906 / 0.122 | 0.992 / 0.026 | 0.728 / 0.180 | 0.996 / 0.012 | 1.000 / 0.008 | 0.910 / 0.084 |
+| XGBoost+Isotonic | 0.837 / 0.156 | 0.905 / 0.122 | 0.991 / 0.026 | 0.725 / 0.180 | 0.994 / 0.011 | 0.999 / 0.008 | 0.909 / 0.084 |
+| MLP | 0.827 / 0.163 | 0.889 / 0.137 | 0.991 / 0.032 | 0.686 / 0.185 | 0.973 / 0.021 | 0.996 / 0.048 | 0.894 / 0.098 |
+| DecisionTree | 0.758 / 0.181 | 0.798 / 0.179 | 0.953 / 0.061 | 0.695 / 0.185 | 0.974 / 0.015 | 0.975 / 0.036 | 0.859 / 0.110 |
+
+* auroc: Friedman chi2=40.54, p=1.4e-05; Nemenyi CD=6.16; avg rank MO=6.83, CatBoost=2.08; min Holm-Wilcoxon p=0.312
+* brier: Friedman chi2=40.85, p=1.2e-05; Nemenyi CD=6.16; avg rank MO=6.83, CatBoost=2.17; min Holm-Wilcoxon p=0.312
+* H1 SUPPORTED (6/6, one-sided Wilcoxon p=0.016)
+* H2 SUPPORTED (4/6; fails: liver_ilpd, thyroid_sick)
+* H3 SUPPORTED (6/6, p=0.016)
+* H4 SUPPORTED (literal ratio 0.11-0.25 on 6/6; AUROC loss <= 0.01 on 5/6)
+
+The MO-Fuzzy models had on average 3.3 rules and 3.9 literals (SO-hybrid: 10.5 rules / 21.9 literals).
+Recomputing the metrics from stored predictions (D3) changed 70 stored calibration slopes and intercepts, all from fits computed with the pre-D3 solver; no other metric changed.
+
+**Outputs.** Statistics: `results/final/stats.json`. Tables: `paper/tables/*.tex`. Macros:
+`paper/generated/macros.tex`. Figures: `paper/figures/*.pdf`. Manuscript: `paper/main.tex` and
+`paper/sections/*`. Audit: `tools/audit.py` → `results/final/audit_report.json`; all checks pass,
+including the replication of 14 sampled fits (max |Δp| = 0) and byte-identical regeneration.
+Submission pack: `submission_pack/`.
