@@ -241,6 +241,9 @@ def main():
         best_m = avg.idxmin()
         mac.add(macro_name("best rank model", metric), tex_escape(MNAME[best_m]))
         mac.add(macro_name("best rank", metric), fmt(avg[best_m], 2))
+        gap = float(avg[MO] - avg[best_m])
+        mac.add(macro_name("rank gap", metric), fmt(gap, 2))
+        mac.add(macro_name("rank gap vs cd", metric), "smaller" if gap < cd else "larger")
         mac.add(macro_name("min wilcoxon p holm", metric),
                 fmt_p(min(v["p_holm"] for v in st[metric]["wilcoxon_vs_MO"].values())))
     mac.add("resCDq", fmt(stats.studentized_range.ppf(0.95, len(MODELS), np.inf) / math.sqrt(2), 3))
@@ -294,6 +297,9 @@ def main():
                "n_ratio_ok": int((ratio <= 0.5).sum()), "n_loss_ok": int((loss <= 0.01).sum()),
                "supported": bool((ratio <= 0.5).all() and (loss <= 0.01).sum() >= 4)}
     st["hypotheses"] = H
+    mac.add("resNBrierMOBetterHybrid", str(int((br[MO] < br[HYBRID]).sum())))
+    mac.add("resNAurocMOAtLeastHybrid", str(int((au[MO] >= au[HYBRID]).sum())))
+    mac.add("resNBrierMOBetterLogReg", str(int((br[MO] < br["LogReg"]).sum())))
     sup = lambda b: "supported" if b else "not supported"  # noqa: E731
     mac.add("resHOneWins", str(h1_wins)); mac.add("resHOneP", fmt_p(h1_p)); mac.add("resHOne", sup(H["H1"]["supported"]))
     mac.add("resHTwoN", str(int(h2_ok.sum()))); mac.add("resHTwo", sup(H["H2"]["supported"]))
@@ -319,7 +325,6 @@ def main():
     mac.add("resNFits", f"{meta['n_fits']:,}".replace(",", "{,}"))
     mac.add("resNSeeds", str(n_seeds))
     mac.add("resFoldsPerDataset", str(J))
-    mac.add("resWallHours", fmt(meta["wall_time_s_all_sessions"] / 3600, 1))
     mac.add("resComputeHours", fmt(meta["sum_fit_plus_predict_s"] / 3600, 1))
     mac.add("resMaxRSS", f"{meta['max_fit_peak_rss_mb']:.0f}")
     for ds in DATASETS:
@@ -387,7 +392,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
         hb = HIGHER_BETTER.get(metric)
         lines = [r"\begin{table*}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{3pt}",
                  rf"\caption{{{caption}}}", rf"\label{{{label}}}",
-                 r"\begin{tabular}{l" + "c" * len(DATASETS) + "}", r"\toprule",
+                 r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{l" + "c" * len(DATASETS) + "}", r"\toprule",
                  r" & \multicolumn{2}{c}{Development} & \multicolumn{4}{c}{Held-out} \\",
                  r"\cmidrule(lr){2-3}\cmidrule(lr){4-7}",
                  "Model & " + " & ".join(DNAME[d_] for d_ in DATASETS) + r" \\", r"\midrule"]
@@ -407,7 +412,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
                 cells.append(rf"\textbf{{{c}}}" if best[ds] == m else c)
             name = MNAME[m] + (r"$^\dagger$" if m == ABLATION else "")
             lines.append(f"{name} & " + " & ".join(cells) + r" \\")
-        lines += [r"\bottomrule", r"\end{tabular}", r"\end{table*}"]
+        lines += [r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table*}"]
         (tabdir / f"{label.split(':')[1]}.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     note = (r"Mean\,$\pm$\,SD over {J} outer test folds (5 seeds $\times$ 5 folds); bold = best of the 11 "
@@ -426,7 +431,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
              r"\caption{Interpretability and cost, averaged over all datasets and folds. Rules = distinct "
              r"active rules (fuzzy) or leaves (tree); literals = antecedent conditions summed over rules "
              r"(tree: sum of leaf depths). Fit time includes inner tuning or evolution, single-threaded.}",
-             r"\label{tab:complexity}", r"\begin{tabular}{lrrrrr}", r"\toprule",
+             r"\label{tab:complexity}", r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{lrrrrr}", r"\toprule",
              r"Model & Rules & Ante./rule & Literals & Fit (s) & Peak RSS (MB) \\", r"\midrule"]
     for m in MODELS + [ABLATION]:
         sub = S[S.model == m]
@@ -437,7 +442,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
         fit = "--" if m == ABLATION else g("fit_s", 1)
         lines.append(f"{MNAME[m]} & {g('n_rules', 1)} & {g('mean_antecedents', 2)} & {g('complexity', 1)} & "
                      f"{fit} & {rss:.0f} \\\\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}"]
     (tabdir / "complexity.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # ranks & across-dataset tests
@@ -445,7 +450,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
              r"\caption{Average ranks over the 6 datasets (1 = best) and two-sided exact Wilcoxon signed-rank "
              r"tests of MO-Fuzzy against each model on dataset means, Holm-corrected. With $N=6$ the smallest "
              r"attainable two-sided $p$ is 0.031, so no comparison can survive Holm correction (declared in "
-             r"the preregistration).}", r"\label{tab:ranks}", r"\begin{tabular}{lrrrrrr}", r"\toprule",
+             r"the preregistration).}", r"\label{tab:ranks}", r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{lrrrrrr}", r"\toprule",
              r" & \multicolumn{3}{c}{AUROC} & \multicolumn{3}{c}{Brier} \\",
              r"\cmidrule(lr){2-4}\cmidrule(lr){5-7}",
              r"Model & Rank & $p$ & $p_{\mathrm{Holm}}$ & Rank & $p$ & $p_{\mathrm{Holm}}$ \\", r"\midrule"]
@@ -462,7 +467,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
               rf"{{{fmt(st['brier']['friedman_chi2'], 2)} ($p={fmt_p(st['brier']['friedman_p'])}$)}} \\",
               rf"Nemenyi CD ($\alpha=0.05$) & \multicolumn{{3}}{{c}}{{{fmt(st['auroc']['nemenyi_cd'], 2)}}} & "
               rf"\multicolumn{{3}}{{c}}{{{fmt(st['brier']['nemenyi_cd'], 2)}}} \\",
-              r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+              r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}"]
     (tabdir / "ranks.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # per-dataset NB tests: MO minus model, significance after Holm
@@ -470,7 +475,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
              r"\caption{Per-dataset difference MO-Fuzzy $-$ model (AUROC / Brier) with Nadeau--Bengio corrected "
              r"resampled $t$-tests over 25 paired folds, Holm-corrected within dataset and metric. "
              r"$^{*}$: $p_{\mathrm{Holm}}<0.05$. Positive AUROC and negative Brier differences favour MO-Fuzzy.}",
-             r"\label{tab:nb}", r"\begin{tabular}{l" + "c" * len(DATASETS) + "}", r"\toprule",
+             r"\label{tab:nb}", r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{l" + "c" * len(DATASETS) + "}", r"\toprule",
              "Model & " + " & ".join(DNAME[d] for d in DATASETS) + r" \\", r"\midrule"]
     for m in MODELS:
         if m == MO:
@@ -484,7 +489,7 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
                 parts.append(f"{v['mean_diff']:+.3f}{star}")
             cells.append(" / ".join(parts))
         lines.append(f"{MNAME[m]} & " + " & ".join(cells) + r" \\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table*}"]
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table*}"]
     (tabdir / "nb_tests.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # hypotheses
@@ -502,11 +507,11 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
     ]
     lines = [r"\begin{table}[t]", r"\centering", r"\scriptsize", r"\setlength{\tabcolsep}{3pt}",
              r"\caption{Preregistered hypotheses (PREREGISTRATION.md \S5) and outcomes.}", r"\label{tab:hyp}",
-             r"\begin{tabular}{lp{5.4cm}lp{1.6cm}}", r"\toprule", r"ID & Criterion & Observed & Outcome \\",
+             r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{lp{5.4cm}lp{1.6cm}}", r"\toprule", r"ID & Criterion & Observed & Outcome \\",
              r"\midrule"]
     for r_ in rows:
         lines.append(" & ".join(r_) + r" \\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}"]
     (tabdir / "hypotheses.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     # Pareto / archive table
@@ -514,13 +519,13 @@ def write_tables(S, st, HV, tabdir: Path, mac: Macros, res: Path):
              r"\caption{External-archive statistics of MO-Fuzzy (mean\,$\pm$\,SD over folds): normalised "
              r"hypervolume on inner out-of-fold objectives and on the outer test fold (refitted archive "
              r"members), archive size, and modal selected $\lambda$ of the deployed rule base.}",
-             r"\label{tab:pareto}", r"\begin{tabular}{lcccc}", r"\toprule",
+             r"\label{tab:pareto}", r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{lcccc}", r"\toprule",
              r"Dataset & HV (inner) & HV (test) & Archive size & Modal $\lambda$ \\", r"\midrule"]
     for _, r_ in HV.iterrows():
         lines.append(f"{DNAME[r_.dataset]} & {fmt(r_.inner_hv)}\\,$\\pm$\\,{fmt(r_.inner_hv_sd)} & "
                      f"{fmt(r_.test_hv)}\\,$\\pm$\\,{fmt(r_.test_hv_sd)} & {fmt(r_.archive, 1)} & "
                      f"{r_.lam_mode:g} \\\\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}"]
     (tabdir / "pareto.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     write_rule_tables(res, tabdir, mac)
@@ -565,7 +570,7 @@ def write_rule_tables(res, tabdir, mac):
                  rf"AUROC is closest to the median over 25 folds; test AUROC {fmt(rec.auroc)}, Brier "
                  rf"{fmt(rec.brier)}). Risk score: $\mathrm{{logit}}\,\hat p = w_0 + \sum_r w_r \beta_r(x)$. "
                  rf"Membership-function centres in original units.}}",
-                 rf"\label{{tab:rules_{ds}}}", r"\begin{tabular}{p{0.6cm}p{5.2cm}r}", r"\toprule",
+                 rf"\label{{tab:rules_{ds}}}", r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{p{0.6cm}p{5.2cm}r}", r"\toprule",
                  r"Rule & IF (antecedents) & $w_r$ (log-odds) \\", r"\midrule",
                  rf"$w_0$ & baseline & {base:+.3f} \\"]
         for i, (cond, w) in enumerate(rl, 1):
@@ -575,7 +580,7 @@ def write_rule_tables(res, tabdir, mac):
             for name, c in mfs:
                 lines.append(rf"\multicolumn{{3}}{{l}}{{\quad {tex_escape(name)}: "
                              + ", ".join(f"{v:.3g}" for v in c) + r"} \\")
-        lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+        lines += [r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}"]
         (tabdir / f"rules_{ds}.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
         mac.add(macro_name("rules n", DNAME[ds]), str(len(rl)))
 
@@ -586,13 +591,13 @@ def write_dataset_table(tabdir, res):
              r"\caption{Datasets. Development datasets were used for all design decisions and the pilot; "
              r"held-out datasets were unlocked only after the preregistration was locked. Features: "
              r"numeric / binary / nominal before one-hot encoding.}", r"\label{tab:datasets}",
-             r"\begin{tabular}{llrrrl}", r"\toprule",
+             r"\begin{adjustbox}{max width=\linewidth}", r"\begin{tabular}{llrrrl}", r"\toprule",
              r"Dataset & Role & $n$ & Prev. & Features & Source \\", r"\midrule"]
     for ds in DATASETS:
         d = info[ds]
         lines.append(f"{DNAME[ds]} & {'dev' if ds in DEV else 'held-out'} & {d['n']} & {d['prevalence']:.3f} & "
                      f"{d['n_num']}/{d['n_bin']}/{d['n_nom']} & {tex_escape(d['source'])} \\\\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}"]
     (tabdir / "datasets.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

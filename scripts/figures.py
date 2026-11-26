@@ -176,7 +176,7 @@ def mf_figure(R, res: Path, figdir: Path):
         if not mfs:
             continue
         n = len(mfs)
-        fig, axes = plt.subplots(1, n, figsize=(min(7.2, 1.9 * n + 0.4), 1.5), squeeze=False)
+        fig, axes = plt.subplots(1, n, figsize=(min(7.2, 2.2 * n + 0.4), 1.7), squeeze=False)
         for ax, (name, c) in zip(axes[0], mfs):
             c1, c2, c3 = c
             span = c3 - c1
@@ -184,10 +184,12 @@ def mf_figure(R, res: Path, figdir: Path):
             low = np.clip((c2 - x) / (c2 - c1), 0, 1)
             high = np.clip((x - c2) / (c3 - c2), 0, 1)
             med = np.clip(1 - low - high, 0, 1)
-            for yv, col, ls, lab, xc in ((low, C_BLUE, "-", "Low", c1), (med, C_ORANGE, "--", "Medium", c2),
-                                         (high, C_AQUA, "-.", "High", c3)):
+            # labels sit over each set's plateau/peak, anchored away from the neighbours so they never collide
+            for yv, col, ls, lab, xc, ha in ((low, C_BLUE, "-", "Low", x[0], "left"),
+                                             (med, C_ORANGE, "--", "Medium", c2, "center"),
+                                             (high, C_AQUA, "-.", "High", x[-1], "right")):
                 ax.plot(x, yv, color=col, ls=ls, lw=1.4)
-                ax.text(xc, 1.06, lab, ha="center", va="bottom", fontsize=6, color=C_TEXT)
+                ax.text(xc, 1.06, lab, ha=ha, va="bottom", fontsize=6.5, color=C_TEXT)
             ax.set_ylim(0, 1.25)
             ax.set_yticks([0, 0.5, 1])
             ax.set_xlabel(name)
