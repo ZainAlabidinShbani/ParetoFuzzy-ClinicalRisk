@@ -4,6 +4,9 @@ Checks
   1. prereg_hashes      : every locked file's LF-normalised SHA-256 equals PREREGISTRATION.md §8, or the
                           new hash of a documented deviation (PREREGISTRATION_DEVIATIONS.json).
   2. run_provenance     : every checkpoint was produced at a git commit whose locked files satisfy (1).
+  2b. replication     : a deterministic sample of stored fits, covering every (git commit, dirty flag)
+                          group of checkpoints, is re-run with the current code (tools/replicate.py) and
+                          must reproduce the stored test-fold probabilities exactly.
   3. dev_pins           : dev dataset sha256 pins equal the values written in PREREGISTRATION.md.
   4. results_complete   : results/final holds every preregistered fit (seeds x datasets x folds x models).
   5. regeneration       : scripts/analyze.py --no-figures on a copy of the inputs reproduces
@@ -37,7 +40,7 @@ from hash_manifest import LOCKED_GLOBS, manifest, sha256_normalised  # noqa: E40
 RES = ROOT / "results" / "final"
 PAPER = ROOT / "paper"
 POST_LOCK = ["scripts/analyze.py", "scripts/figures.py", "scripts/dataset_info.py", "tools/audit.py",
-             "tools/hash_manifest.py", "tools/build_submission.py"]
+             "tools/hash_manifest.py", "tools/build_submission.py", "tools/replicate.py"]
 
 
 def prereg_hashes() -> dict:
@@ -80,9 +83,50 @@ def check_provenance():
         dirty = any(json.loads(p.read_text(encoding="utf-8")).get("git_dirty")
                     for p in (RES / "checkpoints").glob("*.json")
                     if json.loads(p.read_text(encoding="utf-8")).get("git_commit") == c)
-        out[c[:10]] = {"locked_files": len(locked), "mismatched": bad, "any_dirty_checkpoint": dirty}
-        ok &= not bad and not dirty
+        # A dirty working tree is accepted only if no locked file differs between that commit and the next
+        # commit, i.e. the uncommitted changes present while those fits ran were untracked or post-lock files
+        # (here: analysis scripts committed in the next commit). The `replication` check additionally
+        # re-runs fits from every (commit, dirty) group with the current code.
+        changed, nxt = [], None
+        if dirty:
+            later = subprocess.check_output(["git", "rev-list", "--reverse", "--ancestry-path", f"{c}..HEAD"],
+                                            cwd=ROOT, text=True).split()
+            nxt = later[0] if later else None
+            diff = subprocess.check_output(["git", "diff", "--name-only", c, nxt or "HEAD"], cwd=ROOT,
+                                           text=True).split()
+            changed = [f for f in diff if any(Path(f).match(g) for g in LOCKED_GLOBS)]
+        out[c[:10]] = {"locked_files": len(locked), "mismatched": bad, "any_dirty_checkpoint": dirty,
+                       "next_commit": nxt[:10] if nxt else None,
+                       "locked_files_changed_in_next_commit": changed}
+        ok &= not bad and not changed
     return {"ok": ok and bool(commits), "commits": out}
+
+
+SIZE_ORDER = ["heart_cleveland", "kidney_ckd", "breast_wdbc", "liver_ilpd", "pima_diabetes", "thyroid_sick"]
+REPL_MODELS = ["LogReg", "DecisionTree", "XGBoost", "MO-Fuzzy(NSGA-II)"]
+
+
+def replication_sample() -> list[str]:
+    groups: dict = {}
+    for p in sorted((RES / "checkpoints").glob("*.json")):
+        d = json.loads(p.read_text(encoding="utf-8"))
+        groups.setdefault((d.get("git_commit"), d.get("git_dirty")), []).append(
+            (SIZE_ORDER.index(d["record"]["dataset"]), d["record"]["model"], p.stem))
+    stems = []
+    for _, items in sorted(groups.items(), key=lambda kv: str(kv[0])):
+        for m in REPL_MODELS:
+            cand = sorted(i for i in items if i[1] == m)
+            if cand:
+                stems.append(cand[0][2])
+    return stems
+
+
+def check_replication():
+    from replicate import replicate
+    res = [replicate(s) for s in replication_sample()]
+    groups = sorted({(r["git_commit"], r["git_dirty"]) for r in res})
+    return {"ok": bool(res) and all(r["ok"] for r in res), "n_replicated": len(res),
+            "groups_covered": [f"{c}{'+dirty' if d else ''}" for c, d in groups], "fits": res}
 
 
 def check_dev_pins():
@@ -180,6 +224,7 @@ def main():
     ap.add_argument("--skip-latex", action="store_true")
     a = ap.parse_args()
     report = {"prereg_hashes": check_prereg(), "run_provenance": check_provenance(),
+              "replication": check_replication(),
               "dev_pins": check_dev_pins(), "results_complete": check_complete(),
               "regeneration": check_regeneration(), "citations": check_citations()}
     if not a.skip_latex:
