@@ -1,0 +1,80 @@
+{
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "folds": 5,
+  "config": {
+    "folds": 5,
+    "pop_size": 80,
+    "n_gen": 80,
+    "n_iter": 20,
+    "R_max": 12,
+    "L_max": 4
+  },
+  "models": [
+    "LogReg",
+    "DecisionTree",
+    "XGBoost",
+    "LightGBM",
+    "CatBoost",
+    "MLP",
+    "XGBoost+Platt",
+    "XGBoost+Isotonic",
+    "SO-GA-Fuzzy(classic)",
+    "SO-GA-Fuzzy(hybrid)",
+    "MO-Fuzzy(NSGA-II)"
+  ],
+  "datasets": [
+    "pima_diabetes",
+    "heart_cleveland",
+    "breast_wdbc",
+    "liver_ilpd",
+    "thyroid_sick",
+    "kidney_ckd"
+  ],
+  "n_fits": 1650,
+  "n_records": 1800,
+  "sum_fit_plus_predict_s": 39582.8,
+  "wall_time_s_all_sessions": 37948.9,
+  "n_sessions": 30,
+  "max_fit_peak_rss_mb": 301.8,
+  "max_session_peak_working_set_mb": 301.8,
+  "git_commits_of_checkpoints": [
+    "0d46cfe07b4ccd859fa22583a3261890c21814e6",
+    "872cdad7ecd1a99288fa3b8b9251423171dfafc9",
+    "cc126e38256ee540f1650fc933d9c0e8c442ae31",
+    "f98b39e737d33fb10ae3af2094e31e58c5a3fd70"
+  ],
+  "dataset_sha256": {
+    "pima_diabetes": "c1b530cb22b468b5bc6da61d1467eec08882409d8edf89b0c7ae7bf6596b86f2",
+    "heart_cleveland": "8148e64304223f8ec9adf98dba07419772ffc87188c3ca242f70d7a3e3ccd451",
+    "breast_wdbc": "63ec475a3f5161c10bd8127d314637dce134bc5893560a9d5fff5de74353cf79",
+    "liver_ilpd": "2115bfaf47d1b1de7129a414ff2b00ea1ce74d998f864a63feaa3cd2979bc50c",
+    "thyroid_sick": "8cc90b5f5d134f584fe64181ed31b0889a6a179445ae6ea80c0d3c15e44b3a9a",
+    "kidney_ckd": "b910a3bf619d3f25424a5fdf9ba9bc9411db9380e8a883faf92ce8d0f819c77f"
+  },
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "cpu": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+  "logical_cpus": 16,
+  "ram_gb": 15.6,
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.1.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.17.1",
+    "xgboost": "3.2.0",
+    "lightgbm": "4.7.0",
+    "catboost": "1.2.10",
+    "pymoo": "0.6.2"
+  },
+  "threads": {
+    "BLAS/OpenMP": 1,
+    "model_n_jobs": 1,
+    "search_n_jobs": 1
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "breast_wdbc": {
+    "missing_cells": 0,
+    "n": 569,
+    "n_bin": 0,
+    "n_nom": 0,
+    "n_num": 30,
+    "n_pos": 212,
+    "prevalence": 0.372583,
+    "role": "heldout",
+    "sha256": "63ec475a3f5161c10bd8127d314637dce134bc5893560a9d5fff5de74353cf79",
+    "source": "OpenML 1510"
+  },
+  "heart_cleveland": {
+    "missing_cells": 7,
+    "n": 303,
+    "n_bin": 3,
+    "n_nom": 4,
+    "n_num": 6,
+    "n_pos": 138,
+    "prevalence": 0.455446,
+    "role": "dev",
+    "sha256": "8148e64304223f8ec9adf98dba07419772ffc87188c3ca242f70d7a3e3ccd451",
+    "source": "OpenML 49"
+  },
+  "kidney_ckd": {
+    "missing_cells": 1012,
+    "n": 400,
+    "n_bin": 10,
+    "n_nom": 0,
+    "n_num": 14,
+    "n_pos": 250,
+    "prevalence": 0.625,
+    "role": "heldout",
+    "sha256": "b910a3bf619d3f25424a5fdf9ba9bc9411db9380e8a883faf92ce8d0f819c77f",
+    "source": "UCI 336"
+  },
+  "liver_ilpd": {
+    "missing_cells": 0,
+    "n": 583,
+    "n_bin": 1,
+    "n_nom": 0,
+    "n_num": 9,
+    "n_pos": 416,
+    "prevalence": 0.713551,
+    "role": "heldout",
+    "sha256": "2115bfaf47d1b1de7129a414ff2b00ea1ce74d998f864a63feaa3cd2979bc50c",
+    "source": "OpenML 1480"
+  },
+  "pima_diabetes": {
+    "missing_cells": 652,
+    "n": 768,
+    "n_bin": 0,
+    "n_nom": 0,
+    "n_num": 8,
+    "n_pos": 268,
+    "prevalence": 0.348958,
+    "role": "dev",
+    "sha256": "c1b530cb22b468b5bc6da61d1467eec08882409d8edf89b0c7ae7bf6596b86f2",
+    "source": "OpenML 37"
+  },
+  "thyroid_sick": {
+    "missing_cells": 6064,
+    "n": 3772,
+    "n_bin": 20,
+    "n_nom": 2,
+    "n_num": 7,
+    "n_pos": 231,
+    "prevalence": 0.061241,
+    "role": "heldout",
+    "sha256": "8cc90b5f5d134f584fe64181ed31b0889a6a179445ae6ea80c0d3c15e44b3a9a",
+    "source": "OpenML 38"
+  }
+}
