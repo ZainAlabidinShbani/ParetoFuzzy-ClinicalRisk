@@ -1,0 +1,158 @@
+\section{Results}
+\label{sec:results}
+
+All numbers in this section come from \resNFits{} outer-fold fits
+(\resNSeeds{} seeds $\times$ 5 folds $\times$ 6 datasets $\times$ 11 models). They are
+summarised as the mean and standard deviation over the \resFoldsPerDataset{} test folds
+per dataset. Tables~\ref{tab:auroc}--\ref{tab:ece} report discrimination and
+calibration, Table~\ref{tab:hyp} the preregistered hypotheses, and
+Table~\ref{tab:complexity} model size and cost. PR-AUC and calibration slopes are in
+the appendix (Tables~\ref{tab:prauc} and~\ref{tab:slope}).
+
+\input{tables/auroc}
+\input{tables/brier}
+\input{tables/ece}
+
+\subsection{Discrimination and calibration}
+Averaged over the six datasets, MO-Fuzzy reached an AUROC of
+\resMeanAurocAllMOFuzzyNSGAII{} and a Brier score of \resMeanBrierAllMOFuzzyNSGAII{}.
+CatBoost, the strongest model, reached \resMeanAurocAllCatBoost{} and
+\resMeanBrierAllCatBoost{}, and L2 logistic regression reached \resMeanAurocAllLogReg{}
+and \resMeanBrierAllLogReg{}. The classic genetic-fuzzy baseline reached
+\resMeanAurocAllSOGAFuzzyClassic{} and \resMeanBrierAllSOGAFuzzyClassic{}. On the four
+held-out datasets the mean Brier scores were \resMeanBrierHeldoutMOFuzzyNSGAII{}
+(MO-Fuzzy), \resMeanBrierHeldoutSOGAFuzzyHybrid{} (SO-GA-Fuzzy hybrid),
+\resMeanBrierHeldoutSOGAFuzzyClassic{} (SO-GA-Fuzzy classic), \resMeanBrierHeldoutCatBoost{}
+(CatBoost) and \resMeanBrierHeldoutLogReg{} (logistic regression).
+
+The ranking differs by dataset. On Pima, MO-Fuzzy had the highest AUROC
+(\resMOAurocPima{}) and the lowest Brier score (\resBestBrierPima{}) of all eleven
+models. On Cleveland, WDBC and ILPD the best model in both metrics was logistic
+regression, and MO-Fuzzy trailed it by up to a few hundredths. On the thyroid and CKD
+data, which are close to separable, the best tree ensembles reached near-perfect
+discrimination and Brier scores of \resBestBrierThyroid{} and \resBestBrierCKD{}. There
+MO-Fuzzy, with on average \resMORulesThyroid{} and \resMORulesCKD{} rules, discriminated
+well (AUROC \resMOAurocThyroid{} and \resMOAurocCKD{}) but was clearly less sharp than
+the ensembles (Brier \resMOBrierThyroid{} and \resMOBrierCKD{}).
+
+Among the genetic-fuzzy models, MO-Fuzzy had the lowest mean ECE
+(\resMeanEceAllMOFuzzyNSGAII{}, against \resMeanEceAllSOGAFuzzyHybrid{} for the hybrid
+and \resMeanEceAllSOGAFuzzyClassic{} for the classic baseline). This is close to the
+tuned ensembles (\resMeanEceAllCatBoost{} for CatBoost and \resMeanEceAllXGBoost{} for
+XGBoost). MO-Fuzzy had a lower Brier score than the single-objective hybrid on
+\resNBrierMOBetterHybrid{} of 6 datasets and an AUROC at least as high on
+\resNAurocMOAtLeastHybrid{} of 6, with a fraction of its rules
+(Section~\ref{sec:complexity}). Its median absolute deviation of the calibration slope
+from 1 was between \resMOSlopeMedianDevThyroid{} (thyroid) and
+\resMOSlopeMedianDevCKD{} (CKD); Table~\ref{tab:slope} gives the slopes. On CKD the
+slope is ill-determined for every model because the predictions separate the classes
+almost perfectly. The pooled reliability diagrams (Fig.~\ref{fig:reliability}) show
+that MO-Fuzzy probabilities follow the diagonal about as closely as those of XGBoost and
+CatBoost. The classic genetic-fuzzy model is systematically miscalibrated on the
+held-out data: its evolved consequents give step-like probabilities that over- or
+under-shoot whole risk bands.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{reliability}
+\caption{Reliability diagrams pooled over all \resFoldsPerDataset{} outer test folds
+(10 equal-width bins; bins with fewer than 10 pooled predictions are omitted). The dashed diagonal is
+perfect calibration.}
+\label{fig:reliability}
+\end{figure}
+
+\subsection{Preregistered hypotheses}
+\input{tables/hypotheses}
+Table~\ref{tab:hyp} gives the outcome of each preregistered criterion.
+\textbf{H1} (Brier: MO-Fuzzy better than the classic genetic-fuzzy model) was
+\resHOne{}: MO-Fuzzy had the lower Brier score on \resHOneWins{}/6 datasets
+(one-sided Wilcoxon $p=\resHOneP{}$, the smallest attainable with $N=6$).
+\textbf{H2} (AUROC within 0.02 of the best gradient-boosted tree on at least four
+datasets) was \resHTwo{} with exactly \resHTwoN{}/6. It failed on ILPD (difference
+\resGbdtGapILPD{}) and thyroid (\resGbdtGapThyroid{}), so the margin is narrow.
+\textbf{H3} (calibration slope closer to 1 than the classic model) was \resHThree{}
+(\resHThreeWins{}/6, $p=\resHThreeP{}$). \textbf{H4} (at most half the literals of the
+single-objective hybrid with an AUROC loss of at most 0.01 on four or more datasets) was
+\resHFour{}. The literal ratio ranged from \resHFourRatioMin{} to \resHFourRatioMax{}
+on the six datasets, and the AUROC loss was within 0.01 on \resHFourLossN{}/6.
+
+\subsection{Across-dataset comparison}
+\input{tables/ranks}
+The Friedman test rejected equal performance for both AUROC
+($\chi^2_{10}=\resFriedmanAurocChi{}$, $p=\resFriedmanAurocP{}$) and Brier score
+($\chi^2_{10}=\resFriedmanBrierChi{}$, $p=\resFriedmanBrierP{}$). CatBoost had the best
+average rank (AUROC \resBestRankAuroc{}, Brier \resBestRankBrier{}). MO-Fuzzy ranked
+\resRankMOAuroc{} and \resRankMOBrier{}, the best of the three genetic-fuzzy models in
+both metrics (Fig.~\ref{fig:cd}). Its rank gap to CatBoost (\resRankGapAuroc{} for AUROC
+and \resRankGapBrier{} for Brier) is \resRankGapVsCdAuroc{} and \resRankGapVsCdBrier{},
+respectively, than the Nemenyi critical difference of \resCdAuroc{}. As the
+preregistration anticipated, no Holm-corrected Wilcoxon comparison of MO-Fuzzy was
+significant (smallest $p_{\mathrm{Holm}}$: \resMinWilcoxonPHolmAuroc{} for AUROC,
+\resMinWilcoxonPHolmBrier{} for Brier). With six datasets these tests cannot separate
+models whose ranks differ by less than the critical difference. The rankings are
+therefore descriptive.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{cd_auroc}\\[2pt]
+\includegraphics[width=\linewidth]{cd_brier}
+\caption{Critical-difference diagrams of average ranks over the six datasets
+(Nemenyi, $\alpha=0.05$; top: AUROC, bottom: Brier). Models joined by a bar are not
+significantly different.}
+\label{fig:cd}
+\end{figure}
+
+\input{tables/nb_tests}
+The per-dataset corrected resampled $t$-tests (Table~\ref{tab:nb}) locate the
+differences. On Pima, Cleveland and ILPD, no difference between MO-Fuzzy and any
+gradient-boosted, calibrated or logistic model was significant, and MO-Fuzzy was
+significantly better than the decision tree in AUROC on Pima and Cleveland. The
+significant deficits of MO-Fuzzy are concentrated on the three near-separable held-out
+datasets. On thyroid it was worse than all gradient-boosted variants in both metrics,
+and in Brier score also worse than the decision tree and the single-objective hybrid;
+on CKD it had a worse Brier score than logistic regression and all gradient-boosted
+variants; and on WDBC it had a worse Brier score than logistic regression and CatBoost.
+Against the classic genetic-fuzzy model, MO-Fuzzy had a significantly better Brier score
+on thyroid and CKD.
+
+\subsection{Pareto fronts and the choice of operating point}
+\label{sec:pareto}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pareto_fronts}
+\caption{Test-fold performance of all external-archive members of MO-Fuzzy against
+their total number of literals (grey points: members from all folds; line: median per
+literal count). Stars mark the preregistered $\varepsilon$-compact operating point and
+diamonds the best-Brier ablation (means over folds). The dashed line is the best
+gradient-boosted tree.}
+\label{fig:pareto}
+\end{figure}
+\input{tables/pareto}
+Fig.~\ref{fig:pareto} shows, for every dataset, test-fold AUROC and Brier score of all
+archive members against their size. Discrimination saturates after very few literals
+on all datasets: further literals mainly lower the Brier score, and only slowly. The
+$\varepsilon$-compact rule therefore selects models near the knee of the front. The
+test-fold hypervolume of the archive was close to its inner-validation hypervolume
+(Table~\ref{tab:pareto}), so the fronts found inside the training folds carried over to
+unseen patients. The largest drop was on Cleveland, the smallest dataset. The
+preregistered best-Brier ablation, taken from the same runs, used
+\resMeanLiteralsAllMOFuzzyBestBrier{} literals on average instead of
+\resMeanLiteralsAllMOFuzzyNSGAII{}. It lowered the mean Brier score from
+\resMeanBrierAllMOFuzzyNSGAII{} to \resMeanBrierAllMOFuzzyBestBrier{} at an essentially
+unchanged mean AUROC (\resMeanAurocAllMOFuzzyBestBrier{} against
+\resMeanAurocAllMOFuzzyNSGAII{}). The front thus makes the trade explicit: the extra
+literals buy a small calibration gain, and the user can choose where to stop.
+
+\subsection{Model size and computational cost}
+\label{sec:complexity}
+\input{tables/complexity}
+The deployed MO-Fuzzy models had on average \resMeanRulesAllMOFuzzyNSGAII{} rules and
+\resMeanLiteralsAllMOFuzzyNSGAII{} literals (Table~\ref{tab:complexity}). The
+single-objective hybrid had \resMeanRulesAllSOGAFuzzyHybrid{} rules and
+\resMeanLiteralsAllSOGAFuzzyHybrid{} literals, the classic genetic-fuzzy model
+\resMeanRulesAllSOGAFuzzyClassic{} rules and \resMeanLiteralsAllSOGAFuzzyClassic{}
+literals; for the tuned decision tree, the table gives leaves and summed leaf depths. A
+MO-Fuzzy fit, including 6{,}400 genome evaluations each with inner 3-fold
+cross-validation over four penalties, took \resFitMOFuzzyNSGAII{}\,s on one CPU thread
+on average, comparable to a tuned CatBoost model (\resFitCatBoost{}\,s). No fit needed
+more than \resMaxRSS{}\,MB of memory.

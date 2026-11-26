@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\caption{Deployed MO-Fuzzy rule base for Thyroid (seed 3, fold 3: the fold whose test AUROC is closest to the median over 25 folds; test AUROC 0.976, Brier 0.023). Risk score: $\mathrm{logit}\,\hat p = w_0 + \sum_r w_r \beta_r(x)$. Membership-function centres in original units.}
+\label{tab:rules_thyroid_sick}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{p{0.6cm}p{5.2cm}r}
+\toprule
+Rule & IF (antecedents) & $w_r$ (log-odds) \\
+\midrule
+$w_0$ & baseline & -5.381 \\
+R1 & referral\_source=SVI is No & -1.689 \\
+R2 & T3 is Low & +6.472 \\
+R3 & TT4 is High & +3.855 \\
+\midrule
+\multicolumn{3}{l}{Low / Medium / High centres:} \\
+\multicolumn{3}{l}{\quad T3: 1.07, 1.45, 2.31} \\
+\multicolumn{3}{l}{\quad TT4: 90.8, 151, 161} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

@@ -1,0 +1,31 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\caption{Average ranks over the 6 datasets (1 = best) and two-sided exact Wilcoxon signed-rank tests of MO-Fuzzy against each model on dataset means, Holm-corrected. With $N=6$ the smallest attainable two-sided $p$ is 0.031, so no comparison can survive Holm correction (declared in the preregistration).}
+\label{tab:ranks}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+ & \multicolumn{3}{c}{AUROC} & \multicolumn{3}{c}{Brier} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Model & Rank & $p$ & $p_{\mathrm{Holm}}$ & Rank & $p$ & $p_{\mathrm{Holm}}$ \\
+\midrule
+LogReg & 3.75 & 0.438 & 1.000 & 3.83 & 0.156 & 0.562 \\
+Decision tree & 10.00 & 0.031 & 0.312 & 9.33 & 0.094 & 0.562 \\
+XGBoost & 4.17 & 0.062 & 0.562 & 4.17 & 0.062 & 0.562 \\
+LightGBM & 4.00 & 0.062 & 0.562 & 3.83 & 0.094 & 0.562 \\
+CatBoost & 2.08 & 0.062 & 0.562 & 2.17 & 0.062 & 0.562 \\
+MLP & 8.67 & 0.438 & 1.000 & 8.50 & 0.219 & 0.562 \\
+XGBoost + Platt & 3.67 & 0.062 & 0.562 & 4.67 & 0.062 & 0.562 \\
+XGBoost + isotonic & 5.33 & 0.094 & 0.562 & 4.00 & 0.062 & 0.562 \\
+SO-GA-Fuzzy (classic) & 9.67 & 0.156 & 0.625 & 10.17 & 0.031 & 0.312 \\
+SO-GA-Fuzzy (hybrid) & 7.83 & 0.438 & 1.000 & 8.50 & 0.438 & 0.562 \\
+MO-Fuzzy (NSGA-II) & 6.83 & -- & -- & 6.83 & -- & -- \\
+\midrule
+Friedman $\chi^2_{10}$ & \multicolumn{3}{c}{40.54 ($p=$<$0.001$)} & \multicolumn{3}{c}{40.85 ($p=$<$0.001$)} \\
+Nemenyi CD ($\alpha=0.05$) & \multicolumn{3}{c}{6.16} & \multicolumn{3}{c}{6.16} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

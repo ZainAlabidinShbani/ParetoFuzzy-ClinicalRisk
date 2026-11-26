@@ -1,0 +1,25 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We proposed an additive zero-order Takagi--Sugeno fuzzy risk score whose partitions and
+rules are evolved by NSGA-II for discrimination, a proper scoring rule and the number of
+literals. Its weights are fitted by penalised logistic regression. In a preregistered,
+leakage-free benchmark on six clinical datasets, all four preregistered hypotheses were
+supported. The proposed score had a lower Brier score than an accuracy-driven
+genetic-fuzzy model on \resHOneWins{} of 6 datasets. It needed between
+\resHFourRatioMin{} and \resHFourRatioMax{} times the literals of a single-objective
+hybrid model without a material loss of AUROC, and its discrimination
+was within 0.02 of the best gradient-boosted tree on \resHTwoN{} of 6 datasets. With an
+average of \resMeanRulesAllMOFuzzyNSGAII{} rules, it was the best-ranked genetic-fuzzy
+model and had the best AUROC and Brier score of all models on the Pima data. Tuned gradient-boosted trees
+and logistic regression remained ahead overall, and markedly so on the near-separable
+thyroid and CKD data, where a few graded rules cannot be as sharp as an ensemble.
+
+Three practical lessons follow. First, a genetic-fuzzy model can be well calibrated
+without post-hoc recalibration: optimise a proper scoring rule in the search and fit the
+consequents by likelihood, not by accuracy. Second, the external Pareto archive turns
+the choice between a compact and a larger rule base into an explicit, inspectable
+trade-off. Third, rule-level transparency has a concrete benefit, shown here by a
+referral-source proxy that a \resRulesNThyroid{}-rule model exposes at once. Future work should
+test the scores on external validation cohorts, assess their clinical utility with
+decision-curve analysis, and involve clinicians in judging the rule bases.

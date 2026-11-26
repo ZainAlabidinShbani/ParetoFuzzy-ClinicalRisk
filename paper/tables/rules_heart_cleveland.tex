@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\caption{Deployed MO-Fuzzy rule base for Cleveland (seed 0, fold 2: the fold whose test AUROC is closest to the median over 25 folds; test AUROC 0.902, Brier 0.131). Risk score: $\mathrm{logit}\,\hat p = w_0 + \sum_r w_r \beta_r(x)$. Membership-function centres in original units.}
+\label{tab:rules_heart_cleveland}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{p{0.6cm}p{5.2cm}r}
+\toprule
+Rule & IF (antecedents) & $w_r$ (log-odds) \\
+\midrule
+$w_0$ & baseline & -1.977 \\
+R1 & chol is High AND thal=normal is No & +2.732 \\
+R2 & slope=up is No & +2.181 \\
+R3 & ca is Low & -2.764 \\
+R4 & sex=male is Yes AND fbs=t is No & +1.564 \\
+R5 & cp=asympt is Yes & +1.870 \\
+\midrule
+\multicolumn{3}{l}{Low / Medium / High centres:} \\
+\multicolumn{3}{l}{\quad chol: 206, 225, 286} \\
+\multicolumn{3}{l}{\quad ca: 0.0189, 0.169, 0.782} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

@@ -1,0 +1,30 @@
+\begin{table*}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Brier score (lower is better). Mean\,$\pm$\,SD over 25 outer test folds (5 seeds $\times$ 5 folds); bold = best of the 11 preregistered models per dataset. $^\dagger$Ablation from the same NSGA-II runs (not ranked).}
+\label{tab:brier}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{2}{c}{Development} & \multicolumn{4}{c}{Held-out} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-7}
+Model & Pima & Cleveland & WDBC & ILPD & Thyroid & CKD \\
+\midrule
+LogReg & 0.158\,$\pm$\,0.017 & \textbf{0.115\,$\pm$\,0.021} & \textbf{0.020\,$\pm$\,0.007} & \textbf{0.172\,$\pm$\,0.008} & 0.027\,$\pm$\,0.003 & 0.005\,$\pm$\,0.005 \\
+Decision tree & 0.181\,$\pm$\,0.017 & 0.179\,$\pm$\,0.029 & 0.061\,$\pm$\,0.019 & 0.185\,$\pm$\,0.010 & 0.015\,$\pm$\,0.003 & 0.036\,$\pm$\,0.020 \\
+XGBoost & 0.156\,$\pm$\,0.016 & 0.124\,$\pm$\,0.022 & 0.025\,$\pm$\,0.008 & 0.180\,$\pm$\,0.008 & 0.009\,$\pm$\,0.003 & 0.006\,$\pm$\,0.005 \\
+LightGBM & 0.157\,$\pm$\,0.016 & 0.123\,$\pm$\,0.022 & 0.024\,$\pm$\,0.008 & 0.182\,$\pm$\,0.008 & 0.008\,$\pm$\,0.002 & \textbf{0.002\,$\pm$\,0.002} \\
+CatBoost & 0.156\,$\pm$\,0.016 & 0.122\,$\pm$\,0.021 & 0.023\,$\pm$\,0.009 & 0.174\,$\pm$\,0.008 & \textbf{0.007\,$\pm$\,0.002} & 0.005\,$\pm$\,0.005 \\
+MLP & 0.163\,$\pm$\,0.016 & 0.137\,$\pm$\,0.034 & 0.032\,$\pm$\,0.020 & 0.185\,$\pm$\,0.014 & 0.021\,$\pm$\,0.004 & 0.048\,$\pm$\,0.031 \\
+XGBoost + Platt & 0.156\,$\pm$\,0.017 & 0.122\,$\pm$\,0.020 & 0.026\,$\pm$\,0.009 & 0.180\,$\pm$\,0.009 & 0.012\,$\pm$\,0.003 & 0.008\,$\pm$\,0.006 \\
+XGBoost + isotonic & 0.156\,$\pm$\,0.018 & 0.122\,$\pm$\,0.022 & 0.026\,$\pm$\,0.008 & 0.180\,$\pm$\,0.008 & 0.011\,$\pm$\,0.003 & 0.008\,$\pm$\,0.007 \\
+SO-GA-Fuzzy (classic) & 0.178\,$\pm$\,0.011 & 0.133\,$\pm$\,0.025 & 0.048\,$\pm$\,0.019 & 0.202\,$\pm$\,0.017 & 0.080\,$\pm$\,0.039 & 0.067\,$\pm$\,0.021 \\
+SO-GA-Fuzzy (hybrid) & 0.167\,$\pm$\,0.018 & 0.151\,$\pm$\,0.031 & 0.033\,$\pm$\,0.014 & 0.197\,$\pm$\,0.019 & 0.017\,$\pm$\,0.004 & 0.011\,$\pm$\,0.008 \\
+MO-Fuzzy (NSGA-II) & \textbf{0.155\,$\pm$\,0.017} & 0.132\,$\pm$\,0.028 & 0.036\,$\pm$\,0.013 & 0.183\,$\pm$\,0.012 & 0.023\,$\pm$\,0.004 & 0.021\,$\pm$\,0.011 \\
+\midrule
+MO-Fuzzy (best-Brier)$^\dagger$ & 0.156\,$\pm$\,0.018 & 0.129\,$\pm$\,0.025 & 0.035\,$\pm$\,0.014 & 0.184\,$\pm$\,0.013 & 0.017\,$\pm$\,0.004 & 0.011\,$\pm$\,0.010 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}

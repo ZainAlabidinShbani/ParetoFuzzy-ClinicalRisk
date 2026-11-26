@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Interpretability and cost, averaged over all datasets and folds. Rules = distinct active rules (fuzzy) or leaves (tree); literals = antecedent conditions summed over rules (tree: sum of leaf depths). Fit time includes inner tuning or evolution, single-threaded.}
+\label{tab:complexity}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Rules & Ante./rule & Literals & Fit (s) & Peak RSS (MB) \\
+\midrule
+LogReg & -- & -- & -- & 1.1 & 265 \\
+Decision tree & 4.8 & 2.21 & 11.4 & 1.3 & 265 \\
+XGBoost & -- & -- & -- & 5.7 & 277 \\
+LightGBM & -- & -- & -- & 5.1 & 275 \\
+CatBoost & -- & -- & -- & 55.2 & 275 \\
+MLP & -- & -- & -- & 5.5 & 273 \\
+XGBoost + Platt & -- & -- & -- & 5.9 & 282 \\
+XGBoost + isotonic & -- & -- & -- & 5.8 & 283 \\
+SO-GA-Fuzzy (classic) & 8.1 & 2.07 & 16.6 & 11.0 & 282 \\
+SO-GA-Fuzzy (hybrid) & 10.5 & 2.07 & 21.9 & 70.6 & 205 \\
+MO-Fuzzy (NSGA-II) & 3.3 & 1.15 & 3.9 & 48.3 & 199 \\
+MO-Fuzzy (best-Brier) & 6.3 & 1.54 & 9.8 & -- & 199 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

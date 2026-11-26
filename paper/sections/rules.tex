@@ -1,0 +1,44 @@
+\section{Clinical rule interpretability}
+\label{sec:rules}
+
+Tables~\ref{tab:rules_heart_cleveland} and~\ref{tab:rules_thyroid_sick} show two
+deployed MO-Fuzzy rule bases, one per dataset type: development (Cleveland) and
+held-out (thyroid). To avoid choosing favourable examples, each is taken from the
+outer fold whose test AUROC is closest to the median over the 25 folds of that dataset.
+The model is read like a point score. Start from the baseline log-odds $w_0$ and add
+$w_r$ for every rule whose conditions hold, scaled by its firing strength when a
+condition holds only partly. Then convert the sum to a probability with the logistic
+function. Fig.~\ref{fig:mf} shows the learnt membership functions in original units.
+
+\input{tables/rules_heart_cleveland}
+\input{tables/rules_thyroid_sick}
+
+The Cleveland model has \resRulesNCleveland{} rules. Asymptomatic chest pain, a
+non-upsloping ST segment, male sex without raised fasting blood sugar, and high serum
+cholesterol without a normal thallium scan each add risk. A low number of major vessels
+coloured by fluoroscopy (\texttt{ca}) lowers it. All are standard variables of the
+study that produced the data~\cite{detrano1989}, recorded routinely, so the score can be
+computed at the bedside without software. Whether the rules are clinically acceptable
+must still be judged by domain experts.
+
+The thyroid model has \resRulesNThyroid{} rules, and a single rule on a low T3
+concentration carries most of the weight. One rule refers to the referral source rather
+than to the patient's physiology: patients not referred through the \texttt{SVI} source
+have lower risk. A rule like this records how patients reached the laboratory, not why
+they were ill. It is a proxy of the kind discussed under leakage~\cite{kaufman2012}
+and may not transport to other settings. Black-box models can exploit such a variable just as
+well, but there it stays hidden. A model with \resRulesNThyroid{} rules makes the dependence visible
+at a glance and lets a domain expert remove the variable and refit. This is the
+practical meaning of interpretability that our literal count is meant to
+approximate~\cite{rudin2019}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\linewidth]{mf_heart_cleveland}\\
+\includegraphics[width=0.8\linewidth]{mf_thyroid_sick}
+\caption{Learnt Low/Medium/High membership functions (original units) of the continuous
+variables used by the rule bases in Tables~\ref{tab:rules_heart_cleveland} (top) and
+\ref{tab:rules_thyroid_sick} (bottom). The partitions are strong (memberships sum to
+one), so each value has a unique linguistic reading.}
+\label{fig:mf}
+\end{figure}

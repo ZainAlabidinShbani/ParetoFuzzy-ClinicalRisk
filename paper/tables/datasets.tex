@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Datasets. Development datasets were used for all design decisions and the pilot; held-out datasets were unlocked only after the preregistration was locked. Features: numeric / binary / nominal before one-hot encoding.}
+\label{tab:datasets}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{llrrrl}
+\toprule
+Dataset & Role & $n$ & Prev. & Features & Source \\
+\midrule
+Pima & dev & 768 & 0.349 & 8/0/0 & OpenML 37 \\
+Cleveland & dev & 303 & 0.455 & 6/3/4 & OpenML 49 \\
+WDBC & held-out & 569 & 0.373 & 30/0/0 & OpenML 1510 \\
+ILPD & held-out & 583 & 0.714 & 9/1/0 & OpenML 1480 \\
+Thyroid & held-out & 3772 & 0.061 & 7/20/2 & OpenML 38 \\
+CKD & held-out & 400 & 0.625 & 14/10/0 & UCI 336 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

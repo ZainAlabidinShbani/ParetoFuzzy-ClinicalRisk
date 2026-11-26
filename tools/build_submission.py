@@ -53,7 +53,7 @@ def main():
     mac = macros()
 
     hl = [detex(m.group(1), mac) for m in re.finditer(r"\\item\s+(.*)",
-                                                       (PAPER / "generated" / "highlights.tex").read_text(encoding="utf-8"))]
+                                                       (PAPER / "sections" / "highlights.tex").read_text(encoding="utf-8"))]
     too_long = [h for h in hl if len(h) > 85]
     if not 3 <= len(hl) <= 5 or too_long:
         raise SystemExit(f"highlights invalid: n={len(hl)}, too long: {too_long}")

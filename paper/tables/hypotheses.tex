@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Preregistered hypotheses (PREREGISTRATION.md \S5) and outcomes.}
+\label{tab:hyp}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lp{5.4cm}lp{1.6cm}}
+\toprule
+ID & Criterion & Observed & Outcome \\
+\midrule
+H1 & Brier: MO-Fuzzy $<$ SO-GA-Fuzzy (classic) on $\geq$5/6 datasets and one-sided Wilcoxon $p<0.05$ & 6/6, $p=0.016$ & \textbf{Supported} \\
+H2 & AUROC: MO-Fuzzy $\geq$ best GBDT $-0.02$ on $\geq$4/6 datasets & 4/6 & \textbf{Supported} \\
+H3 & $|$slope$-1|$: MO-Fuzzy $<$ SO-GA-Fuzzy (classic) on $\geq$4/6 and one-sided Wilcoxon $p<0.05$ & 6/6, $p=0.016$ & \textbf{Supported} \\
+H4 & Literals: MO $\leq 0.5\times$ SO-hybrid on 6/6 and AUROC loss $\leq 0.01$ on $\geq$4/6 & 6/6 and 5/6 & \textbf{Supported} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

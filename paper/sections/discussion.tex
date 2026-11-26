@@ -1,7 +1,35 @@
 \section{Discussion, limitations and threats to validity}
 \label{sec:discussion}
 
-%% <<DISCUSSION_RESULTS>>
+\paragraph{What the results show}
+Optimising a proper scoring rule and fitting the consequents by likelihood closed most
+of the calibration gap between genetic-fuzzy models and tuned ensembles. The proposed
+score had a mean ECE of \resMeanEceAllMOFuzzyNSGAII{}, against
+\resMeanEceAllSOGAFuzzyClassic{} for the accuracy-driven genetic-fuzzy model and
+\resMeanEceAllCatBoost{} for CatBoost, and its reliability curves track the diagonal
+(Fig.~\ref{fig:reliability}). What remains is mostly a gap in sharpness, not in
+calibration. On the near-separable held-out datasets the ensembles reach Brier scores
+close to zero by combining many trees, whereas a score of
+\resMORulesThyroid{} graded rules spreads its probabilities more. This is the price of
+the compactness the score was designed for. Fig.~\ref{fig:pareto} shows that it is
+partly adjustable, since larger archive members recover some of the Brier gap. The
+single-objective hybrid, with the same consequent estimator but several times more
+literals (Table~ef{tab:complexity}), was not better calibrated on average. The calibration therefore comes from
+how the consequents are fitted, not from model size. H2 was met with no slack (exactly
+\resHTwoN{}/6), so the non-inferiority of discrimination to gradient boosting should be
+read as dataset-dependent: it held on both development datasets, WDBC and CKD, and
+failed on ILPD and thyroid.
+
+\paragraph{The solver deviation}
+Deviation D3 (Section~\ref{sec:protocol}) was a numerical failure of a plain Newton
+iteration that silently produced constant predictions on one dataset. It was detected
+only because every per-fold result was inspected before the analysis. We report it
+because it was found after held-out results were visible. It changed the solver and
+not the estimator, and all affected fits were re-run with the fixed code. The
+superseded fits are archived. Still, a reader may reasonably discount the thyroid
+results of the two hybrid-consequent models. The episode also carries a general
+lesson: inner-loop solvers in evolutionary fuzzy systems run a very large number of times on
+unusual design matrices, so they need globally convergent safeguards.
 
 \paragraph{Statistical power}
 Six datasets give little power to across-dataset tests: the smallest attainable
@@ -13,7 +41,8 @@ resampled $t$-tests are approximate, because the 25 folds share training
 data~\cite{nadeau2003}.
 
 \paragraph{Datasets}
-The benchmarks are public, old, small to medium-sized and convenience-sampled. WDBC and
+The benchmarks are public, old and small to medium-sized, and they are convenience
+samples. WDBC and
 CKD are near-separable, which compresses discrimination differences (declared in
 advance). The thyroid data are imbalanced (6\% positives), so binned ECE is dominated
 by the lowest-risk bins. No conclusion about clinical transportability, external
