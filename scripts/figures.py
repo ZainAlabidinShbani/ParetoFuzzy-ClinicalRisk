@@ -199,6 +199,76 @@ def mf_figure(R, res: Path, figdir: Path):
         _save(fig, figdir / f"mf_{ds}.pdf")
 
 
+def graphical_abstract(R, S, fronts, res: Path, figdir: Path):
+    """Stand-alone graphical abstract (Elsevier: >= 1328 x 531 px, readable at 13 x 5 cm).
+
+    Two Pareto trade-off panels (test Brier vs total literals; development and held-out dataset) and
+    the deployed rule base of the held-out example. Every number is computed from the stored results.
+    """
+    big = {"font.size": 9, "axes.titlesize": 9.5, "axes.labelsize": 9, "xtick.labelsize": 8,
+           "ytick.labelsize": 8, "legend.fontsize": 8}
+    with plt.rc_context(big):
+        fig = plt.figure(figsize=(8.8, 3.0))
+        gs = fig.add_gridspec(1, 3, width_ratios=[1, 1, 1.5], wspace=0.30, left=0.07, right=0.995,
+                              top=0.88, bottom=0.27)
+        for j, (ds, tag) in enumerate((("heart_cleveland", "development"), ("thyroid_sick", "held-out"))):
+            ax = fig.add_subplot(gs[0, j])
+            fr = [f for f in fronts if f["dataset"] == ds and f["model"] == MO]
+            P = np.vstack([np.asarray(f["test_front"], float) for f in fr])
+            sel = np.asarray([np.asarray(f["test_front"], float)[f["selected_index"]] for f in fr])
+            jit = np.random.default_rng(0).uniform(-0.2, 0.2, len(P))
+            ax.scatter(P[:, 2] + jit, P[:, 1], s=3, color=C_GRAY, alpha=0.25, linewidths=0, rasterized=True,
+                       label="Pareto-archive members")
+            med = [(L, np.median(P[P[:, 2] == L, 1])) for L in np.unique(P[:, 2]) if (P[:, 2] == L).sum() >= 10]
+            mx, my = zip(*med)
+            ax.plot(mx, my, color=C_BLUE, lw=1.6, label="median trade-off")
+            ax.scatter([sel[:, 2].mean()], [sel[:, 1].mean()], marker="*", s=130, color=C_BLUE,
+                       edgecolors="white", linewidths=0.8, zorder=5, label="deployed score")
+            gb = min(float(S[(S.dataset == ds) & (S.model == g)].brier_mean.iloc[0]) for g in GBDTS)
+            ax.axhline(gb, color=C_TEXT2, lw=0.9, ls="--", label="best boosted trees")
+            ax.set_xlim(-0.5, max(6, np.percentile(P[:, 2], 99) + 1))
+            ax.set_ylim(max(0.0, min(P[:, 1].min(), gb) - 0.005), np.percentile(P[:, 1], 98) + 0.005)
+            ax.set_title(f"{DNAME[ds]} ({tag})")
+            ax.set_xlabel("Total rule literals")
+            if j == 0:
+                ax.set_ylabel("Test Brier score (lower = better)")
+        from matplotlib.lines import Line2D
+        handles = [Line2D([], [], ls="", marker="o", ms=4, color=C_GRAY, alpha=0.6, label="Pareto-archive members"),
+                   Line2D([], [], color=C_BLUE, lw=1.6, label="median trade-off"),
+                   Line2D([], [], ls="", marker="*", ms=11, color=C_BLUE, mec="white", label="deployed score"),
+                   Line2D([], [], color=C_TEXT2, lw=0.9, ls="--", label="best boosted trees")]
+        fig.legend(handles=handles, loc="lower left", ncol=4, frameon=False, bbox_to_anchor=(0.03, 0.0),
+                   handletextpad=0.4, columnspacing=1.2)
+
+        # rule base of the held-out example (same representative fold as the manuscript's rule table)
+        ds = "thyroid_sick"
+        s, f = representative_fold(R, ds)
+        rules = json.loads((res / "rules.json").read_text(encoding="utf-8"))
+        entry = next(r for r in rules if r["dataset"] == ds and r["seed"] == s and r["fold"] == f and r["model"] == MO)
+        base, rl, _ = parse_rules(entry["rules"])
+        mo = S[S.model == MO]
+        cb = S[S.model == "CatBoost"]
+        ax = fig.add_subplot(gs[0, 2])
+        ax.axis("off")
+        lines = [(f"Deployed risk score, {DNAME[ds]} ({len(rl)} rules)", "bold"), ("", None),
+                 (f"logit p = {base:+.2f}", None)]
+        lines += [(f"  {w:+.2f} if {cond}", None) for cond, w in rl]
+        lines += [("", None),
+                  ("Mean over 6 datasets:", "bold"),
+                  (f"MO-Fuzzy  AUROC {mo.auroc_mean.mean():.3f}, Brier {mo.brier_mean.mean():.3f},", None),
+                  (f"          {mo.n_rules_mean.mean():.1f} rules, {mo.complexity_mean.mean():.1f} literals", None),
+                  (f"CatBoost  AUROC {cb.auroc_mean.mean():.3f}, Brier {cb.brier_mean.mean():.3f}", None)]
+        y = 0.98
+        for text, weight in lines:
+            ax.text(0.02, y, text, transform=ax.transAxes, va="top", ha="left", fontsize=8.0,
+                    fontweight=weight or "normal", family="monospace" if weight is None else "serif",
+                    color=C_TEXT)
+            y -= 0.085
+        fig.savefig(figdir / "graphical_abstract.pdf", metadata=PDF_META)
+        fig.savefig(figdir / "graphical_abstract.png", dpi=300, metadata={"Software": None})
+        plt.close(fig)
+
+
 def make_all(R, S, fronts, res: Path, figdir: Path, mac_items=None):
     st = json.loads((res / "stats.json").read_text(encoding="utf-8"))
     pareto_figure(fronts, S, figdir)
@@ -208,3 +278,4 @@ def make_all(R, S, fronts, res: Path, figdir: Path, mac_items=None):
                    f"Average ranks by {lab} over 6 datasets (Nemenyi, $\\alpha=0.05$)",
                    figdir / f"cd_{metric}.pdf")
     mf_figure(R, res, figdir)
+    graphical_abstract(R, S, fronts, res, figdir)
