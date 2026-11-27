@@ -1,0 +1,3 @@
+# GitHub Linguist: report the language of the maintained code (Python), not archived material.
+legacy/** linguist-vendored
+submission_pack/** linguist-generated
