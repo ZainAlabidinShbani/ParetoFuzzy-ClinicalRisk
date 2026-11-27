@@ -6,6 +6,15 @@ Article type: Full Length Article
 Title:
 Pareto-optimal calibrated and interpretable fuzzy risk scoring via multi-objective evolutionary optimisation
 
+Authors:
+1. Zain Alabidin Shbani (corresponding author)
+   Affiliation: École Universitaire de Physique et d'Ingénierie (EUPI), Université Clermont Auvergne, 63170 Aubière, France
+   Email: zain_alabidin.shbani@etu.uca.fr
+2. Beilassan Hdewa
+   Affiliation: SUPMICROTECH-ENSMM, 25000 Besançon, France
+   Email: beilassan.hdewa@supmicrotech.fr
+   ORCID: 0009-0003-4090-6675
+
 Abstract (218 words):
 Clinical risk scores must discriminate, be calibrated and be interpretable, yet genetic-fuzzy models for health risk are optimised for accuracy alone and rarely compared with tuned gradient-boosted trees. We propose a zero-order Takagi-Sugeno additive fuzzy risk score whose linguistic partitions and rules are evolved by NSGA-II for three objectives: 1-AUROC, the Brier score (a strictly proper scoring rule) and the total number of rule literals. Rule weights are fitted by penalised logistic regression with an inner-validated penalty. In a preregistered, leakage-free study (5x5-fold cross-validation, 1,650 model fits, code hashes locked before four held-out datasets were unlocked) comparing eleven models on six public clinical datasets, the proposed score used on average 3.9 literals, against 21.9 for a single-objective genetic-fuzzy model. Its mean AUROC was 0.900 and its mean Brier score 0.092 (CatBoost: 0.913 and 0.081). Preregistered hypotheses: calibration advantage over accuracy-driven genetic-fuzzy models (H1) supported; AUROC within 0.02 of the best gradient-boosted tree on 4/6 datasets (H2) supported; calibration-slope advantage (H3) supported; at most half the literals of a single-objective genetic-fuzzy model without material AUROC loss (H4) supported. Optimising a proper scoring rule alongside complexity yields rule-based risk scores of a few rules that are much better calibrated than accuracy-driven genetic-fuzzy models. They approach, but do not match, tuned gradient-boosted trees; the remaining gap is largest on near-separable data.
 
@@ -30,6 +39,8 @@ emails were generated automatically. The expertise the paper needs:
 
 Highlights: see highlights.txt
 Manuscript: manuscript.pdf (elsarticle, preprint 12pt); LaTeX source: latex_source.zip
-Data availability: public datasets (OpenML, UCI); checksums verified by the loaders.
-Declaration of generative AI use: included in the manuscript (authors to review).
-Funding / competing interests / CRediT: placeholders in the manuscript, to be completed by the authors.
+Graphical abstract: graphical_abstract.png (300 dpi) / graphical_abstract.pdf
+Data and code availability: public datasets (OpenML, UCI; checksums verified by the loaders);
+  code and results: https://github.com/ZainAlabidinShbani/ParetoFuzzy-ClinicalRisk (available to reviewers; public upon acceptance).
+Declarations in the manuscript: CRediT authorship contribution statement; declaration of
+  competing interest (none); funding (no specific grant); declaration of generative AI use.

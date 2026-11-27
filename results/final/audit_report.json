@@ -21,7 +21,7 @@
     "errors": [],
     "ok": true,
     "overfull_hbox_warnings": 3,
-    "pages": 31,
+    "pages": 32,
     "return_codes": [
       0,
       0,
@@ -33,9 +33,9 @@
   "post_lock_code_sha256": {
     "scripts/analyze.py": "cc128d34e4a18ebfc7c73cafa1a74447c5098ec6cafda34be73effec87d21695",
     "scripts/dataset_info.py": "ba9cc3944f4f0590b5d8a2f79dfea5e62bbd06d72fda8e7c1a9148aa7bad2956",
-    "scripts/figures.py": "8d3e4558b5eb9130c883f5e517b6be917e6845d94e05da3db52af7f6ff78e920",
+    "scripts/figures.py": "5ac18a4492d379c5185ee77fb7f74e4a976a144b80f1a343713ffd18d58caefe",
     "tools/audit.py": "ca2064d339edd5003baea824ce8236d3d72aafbfb084bc37b1c53bdbbef53fea",
-    "tools/build_submission.py": "5dc17579f33bb0b9abb1640021315ac1819989d9242a7e14b65b943e936c9926",
+    "tools/build_submission.py": "b8063b23e27d03f3e487a1bf67b352aa9b04aadb8a91fcf49b2f7f0cbba41382",
     "tools/hash_manifest.py": "69ddb5f9e1817d16119e379f8e050d10fe16f94f36d2b57eb63ddbbd5a87e072",
     "tools/replicate.py": "790468bbaf24cd23d70146575b9f6f94df21081c8582ae647b9980bd7e7e7a00"
   },
@@ -53,7 +53,7 @@
   },
   "pytest": {
     "ok": true,
-    "summary": "66 passed, 1 skipped in 23.20s"
+    "summary": "66 passed, 1 skipped in 24.84s"
   },
   "regeneration": {
     "differences": [],
